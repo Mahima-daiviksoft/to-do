@@ -170,7 +170,7 @@ Checklist for reconnect:
 Each browser tab opens its own WebSocket by default. 10 tabs = 10 connections per user.
 Options:
 * Accept it (simplest, usually fine).
-* **SharedWorker** holds one WebSocket, and tabs talk to it via `MessagePort`. (SharedWorker support is now broad, including Safari since 16 and Chrome for Android since 2024+. Check your target browsers.)
+* **SharedWorker** holds one WebSocket, and tabs talk to it via `MessagePort`. (SharedWorker is well supported on desktop browsers, and mobile support has historically lagged, so check your target browsers before relying on it.)
 * **Leader election** with `BroadcastChannel` / Web Locks API: one tab owns the socket and rebroadcasts to others.
 
 ---

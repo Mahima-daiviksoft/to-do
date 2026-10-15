@@ -4,7 +4,7 @@
 
 > **Who is this for?** Everyone. If you have never heard the word "socket", start at Chapter 1.
 > If you already ship Spring/STOMP to production, jump to Chapters 6–10. If your interview is
-> tomorrow, read Chapter 12 (Interview Questions) and Chapter 13 (Cheat Sheet).
+> tomorrow, read Chapter 12 (Interview Questions, both parts) and Chapter 13 (Cheat Sheet).
 
 ---
 
@@ -23,7 +23,8 @@
 | 9 | [Reliability, Performance & Tuning](09-reliability-performance.md) | Heart-beats, timeouts, backpressure, thread pools, ordering, delivery guarantees, idempotency, monitoring |
 | 10 | [Testing, Debugging & the Bug Encyclopedia](10-testing-debugging-troubleshooting.md) | Test everything, debug with tools, and fix 60+ real-world bugs by symptom |
 | 11 | [Architecture, Design Patterns & Organisational Best Practices](11-architecture-best-practices.md) | Design chat, notifications, dashboards, collaboration; run it in a big company; runbooks |
-| 12 | [Interview Questions & Answers (Entry → Senior → System Design)](12-interview-questions.md) | Answer 200+ questions with confidence |
+| 12 | [Interview Questions & Answers, Part 1](12-interview-questions.md): fundamentals, WebSocket, browser, STOMP, Spring | Answer the core technical questions with confidence |
+| 12b | [Interview Questions & Answers, Part 2](12-interview-questions-part2.md): security, scaling, reliability, debugging scenarios, system design, coding, rapid-fire, gotchas | Handle senior-level, scenario and design rounds |
 | 13 | [Cheat Sheet & Glossary](13-cheatsheet-glossary.md) | Look anything up in seconds |
 
 ---
