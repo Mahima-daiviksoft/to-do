@@ -1,0 +1,12 @@
+{
+  "name": "jest-book-svelte",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js" },
+  "devDependencies": {
+    "jest": "30.3.0",
+    "jest-environment-jsdom": "30.3.0",
+    "svelte": "^5.0.0",
+    "svelte-jester": "^5.0.0"
+  }
+}

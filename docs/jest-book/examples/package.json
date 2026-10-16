@@ -1,0 +1,30 @@
+{
+  "name": "jest-book-examples",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Runnable examples for the Jest book. Every test here passes on Jest 30.5.",
+  "scripts": {
+    "test": "jest",
+    "test:core": "jest --selectProjects core",
+    "test:react": "jest --selectProjects react",
+    "test:node": "jest --selectProjects node-api"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.0",
+    "babel-jest": "^30.5.0",
+    "express": "^5.1.0",
+    "fast-check": "^4.0.0",
+    "jest": "^30.5.0",
+    "jest-environment-jsdom": "^30.5.0",
+    "msw": "2.15.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "supertest": "^7.1.0"
+  }
+}

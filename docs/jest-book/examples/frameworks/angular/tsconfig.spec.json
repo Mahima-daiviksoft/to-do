@@ -1,0 +1,1 @@
+{ "extends": "./tsconfig.json", "compilerOptions": { "module": "CommonJS", "isolatedModules": true }, "include": ["src/**/*.ts"] }
