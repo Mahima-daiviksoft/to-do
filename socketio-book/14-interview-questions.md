@@ -521,11 +521,16 @@ process restarts.
 It's client-supplied — trustworthy only after you verify it (e.g. JWT signature check).
 
 **E14. [S] Name some real vulnerabilities in the Socket.IO ecosystem.**
-Permissive CORS in old `socket.io` < 2.4.0 (CVE-2020-28481); `socket.io-parser`
-validation bugs enabling crashes (CVE-2022-2421, CVE-2023-32695); `engine.io` uncaught
-exceptions from crafted requests (CVE-2022-41940, CVE-2023-31125); `socket.io` unhandled
-`error` event (CVE-2024-38355); `ws` DoS via many headers (CVE-2024-37890). Lesson: keep
-dependencies patched and monitored.
+Permissive default CORS in `socket.io` < 2.4.0; an unhandled `error` event that could crash
+`socket.io` < 4.6.2; uncaught exceptions from crafted requests in `engine.io` (fixed in
+6.2.1 / 6.4.2) and polling connection exhaustion (fixed in 6.6.7); `socket.io-parser`
+decoding/validation bugs and attachment-based memory exhaustion (fixed in 4.0.5, 4.2.3,
+4.2.6, 4.2.7); `ws` DoS via many headers (8.17.1), memory disclosure (8.20.1) and
+fragment-based memory exhaustion (8.21.0). Pattern: malicious clients crashing or
+exhausting servers with malformed/oversized packets. Lesson: keep the whole stack patched
+(check the lockfile with `npm ls ws engine.io socket.io-parser`), keep
+`maxHttpBufferSize` small, rate-limit, and restart crashed processes. (Ch. 6.10 has the
+full table with advisory ids.)
 
 ---
 

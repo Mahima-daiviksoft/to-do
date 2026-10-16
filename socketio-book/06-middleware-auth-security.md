@@ -486,18 +486,37 @@ Cloudflare) are cheaper than in Node.
 
 ## 6.10 Keep dependencies updated — real vulnerabilities have happened
 
-Over the years, advisories were published for the Socket.IO stack, for example:
+Real advisories have been published for every layer of the stack. This table was pulled
+from the **npm / GitHub advisory database** (October 2026); each row links to the advisory
+by its GHSA id (`https://github.com/advisories/<id>`):
 
-- **Over-permissive CORS** in very old `socket.io` versions (< 2.4.0) — all origins allowed
-  by default (CVE-2020-28481).
-- **`socket.io-parser`** issues: insufficient validation of attachments/packets allowing a
-  malicious client to crash a server (e.g. CVE-2022-2421, CVE-2023-32695).
-- **`engine.io`** issues: specially crafted requests causing uncaught exceptions → process
-  crash (e.g. CVE-2022-41940, CVE-2023-31125).
-- **`socket.io`**: an unhandled `error` event that could crash the process
-  (CVE-2024-38355, fixed in 4.6.2 / 2.5.1).
-- **`ws`** (the default WebSocket engine): DoS via a request with too many headers
-  (CVE-2024-37890, fixed in ws 8.17.1 and backports).
+| Package | Affected versions | Severity | Issue | GHSA id |
+|---|---|---|---|---|
+| `socket.io` | < 2.4.0 | moderate | CORS misconfiguration (all origins allowed by default) | GHSA-fxwf-4rqh-v8g3 |
+| `socket.io` | < 2.5.1, and ≥ 3.0.0 < 4.6.2 | moderate | Unhandled `error` event (can crash the process) | GHSA-25hc-qcg6-38wj |
+| `engine.io` | ≥ 4.0.0 < 6.2.1 | moderate | Uncaught exception from a crafted request | GHSA-r7qp-cfhv-p84w |
+| `engine.io` | ≥ 5.1.0 < 6.4.2 | moderate | Uncaught exception vulnerability | GHSA-q9mw-68c2-j6m5 |
+| `engine.io` | ≥ 4.1.0 < 6.6.7 | **high** | Polling transport connection exhaustion | GHSA-r635-g3xr-vw7x |
+| `socket.io-parser` | ≥ 4.0.0 < 4.0.5 | **critical** | Insufficient validation when decoding a packet | GHSA-qm95-pgcg-qqfq |
+| `socket.io-parser` | ≥ 4.0.4 < 4.2.3 | moderate | Insufficient validation when decoding a packet | GHSA-cqmj-92xf-r6r9 |
+| `socket.io-parser` | ≥ 4.0.0 < 4.2.6 | **high** | Unbounded number of binary attachments | GHSA-677m-j7p3-52f9 |
+| `socket.io-parser` | ≥ 4.0.0 < 4.2.7 | **high** | Zero-attachment memory exhaustion | GHSA-2m8v-j782-fhvr |
+| `ws` | ≥ 8.0.0 < 8.17.1 | **high** | DoS with a request containing many HTTP headers | GHSA-3h5v-q93c-6h6q |
+| `ws` | ≥ 8.0.0 < 8.20.1 | moderate | Uninitialized memory disclosure | GHSA-58qx-3vcg-4xpx |
+| `ws` | ≥ 8.0.0 < 8.21.0 | **high** | Memory exhaustion DoS from tiny fragments | GHSA-96hv-2xvq-fx4p |
+
+(Older major lines — e.g. `ws` 5–7, `socket.io-parser` 3.x — had their own advisories and
+backported fixes; check the advisory pages for your exact version.)
+
+A fresh `npm install socket.io@4.8.4` in October 2026 resolved to `engine.io@6.6.11`,
+`socket.io-parser@4.2.7` and `ws@8.21.3` — all past the fixes above. **But transitive
+versions are pinned by your lockfile**: an old `package-lock.json` can keep a vulnerable
+`ws` or `socket.io-parser` even after you bump `socket.io`. Run `npm ls ws engine.io
+socket.io-parser` to see what you actually ship.
+
+Notice the pattern: almost every issue is "a malicious client sends a malformed or
+oversized packet and crashes or exhausts the server". That's why `maxHttpBufferSize`,
+rate limits and patching matter even for internal apps.
 
 Lessons: run `npm audit` / Dependabot / Snyk in CI, keep `socket.io`, `engine.io`,
 `socket.io-parser` and `ws` patched, and add a `process.on("uncaughtException")` logger +
