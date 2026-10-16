@@ -251,7 +251,7 @@ server → client: max(10000, 10000) = 10000 ms
 ### 4.5.2 What a heart-beat is
 * A heart-beat is **a single EOL** (`\n` or `\r\n`) sent between frames.
 * **Any data** (a real frame) also counts as proof of life. Heart-beats are only needed when idle.
-* The receiver checks: "Have I received *anything* within the interval?" The spec lets implementations add a **tolerance** for network delays. For example, `@stomp/stompjs` declares the server dead after roughly **2×** the negotiated incoming interval with no data, and Spring's simple broker and broker relay use a multiplier of **3×** on the read side (`HEARTBEAT_MULTIPLIER = 3` in their source code). Exact factors can change between versions; the principle is "a few missed beats = dead".
+* The receiver checks: "Have I received *anything* within the interval?" The spec lets implementations add a **tolerance** for network delays. For example, `@stomp/stompjs` declares the server dead after **2×** the negotiated incoming interval with no data (configurable since v7 via `heartbeatToleranceMultiplier`, default `2`), and Spring's simple broker and broker relay use a multiplier of **3×** on the read side (`HEARTBEAT_MULTIPLIER = 3` in their source code). The principle is "a few missed beats = dead". Spring's simple broker implements exactly the negotiation formula above: its read interval is `max(clientHeartbeat[0], serverHeartbeat[1]) × 3` and its write interval is `max(clientHeartbeat[1], serverHeartbeat[0])`.
 * When the receiver decides the peer is dead, it **closes the connection** (and the client reconnects).
 
 ### 4.5.3 Why STOMP heart-beats matter so much over WebSocket

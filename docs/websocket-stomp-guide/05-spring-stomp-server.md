@@ -29,10 +29,15 @@ Spring is like a **big office building**:
   <artifactId>spring-boot-starter-websocket</artifactId>
 </dependency>
 
-<!-- Only if you use an external broker relay (RabbitMQ/ActiveMQ) -->
+<!-- Only if you use an external broker relay (RabbitMQ/ActiveMQ).
+     Spring's reference docs say: add io.projectreactor.netty:reactor-netty and io.netty:netty-all -->
 <dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-starter-reactor-netty</artifactId>
+  <groupId>io.projectreactor.netty</groupId>
+  <artifactId>reactor-netty</artifactId>
+</dependency>
+<dependency>
+  <groupId>io.netty</groupId>
+  <artifactId>netty-all</artifactId>
 </dependency>
 
 <!-- Optional: security for messages -->
@@ -55,7 +60,8 @@ Spring is like a **big office building**:
 **Gradle:**
 ```groovy
 implementation 'org.springframework.boot:spring-boot-starter-websocket'
-implementation 'org.springframework.boot:spring-boot-starter-reactor-netty'   // relay only
+implementation 'io.projectreactor.netty:reactor-netty'                        // relay only
+implementation 'io.netty:netty-all'                                          // relay only
 implementation 'org.springframework.security:spring-security-messaging'       // security
 ```
 
@@ -716,7 +722,7 @@ public boolean configureMessageConverters(List<MessageConverter> messageConverte
 }
 ```
 
-Defaults (when not using Boot's customization): `StringMessageConverter`, `ByteArrayMessageConverter`, and a Jackson JSON converter if Jackson is present. The Jackson 2 converter is `MappingJackson2MessageConverter`; Spring Framework 7 adds Jackson 3 support (`JacksonJsonMessageConverter`) and Jackson 3 is the default in Boot 4. Check your version.
+Defaults (when not using Boot's customization): `StringMessageConverter`, `ByteArrayMessageConverter`, and a Jackson JSON converter if Jackson is present. The Jackson 2 converter is `MappingJackson2MessageConverter`, which is **deprecated for removal since Spring Framework 7.0**. Its Jackson 3 replacement is **`JacksonJsonMessageConverter` (since 7.0)**. On Spring 6.x / Boot 3.x keep using `MappingJackson2MessageConverter`; on Spring 7 / Boot 4 use `JacksonJsonMessageConverter`.
 
 Conversion is chosen by the `content-type` header. **Clients should send `content-type:application/json`** for JSON payloads (stompjs doesn't add it automatically). Without it Spring still attempts conversion with the available converters, and the behaviour can surprise you (e.g., the target type is `String` and you get raw JSON).
 

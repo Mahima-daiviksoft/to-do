@@ -372,4 +372,118 @@ See Chapter 8 §8.6.3: regex the destination, look up ownership, throw `AccessDe
 14. **"Does `maxPoolSize` grow Spring's inbound pool?"** Not with the default unbounded queue.
 15. **"Is SockJS a WebSocket implementation?"** It's an emulation layer with its own protocol, using WebSocket when possible.
 
+---
+
+## O. More questions (added after a research pass on common interview topics)
+
+**O1. [E] People call WebSocket "TCP for the web" and STOMP "HTTP for the web". What does that mean?**
+WebSocket gives browsers a raw, bidirectional message pipe (like TCP gives programs a byte pipe). STOMP adds HTTP-like structure on top (a command, headers and a body), so both sides agree on what a message means and where it goes.
+
+**O2. [E] Walk me through how `/app/**` messages reach a controller.**
+The client SENDs to `/app/chat.send`. Spring sees the application prefix `/app`, strips it, and matches the remainder (`/chat.send`) against `@MessageMapping` patterns. The payload is converted by a `MessageConverter` and the method is invoked on a `clientInboundChannel` thread.
+
+**O3. [M] How does Spring find the "right connection" when you call `convertAndSendToUser`?**
+It doesn't look up a socket directly. It sends to `/user/{name}/queue/x`; `UserDestinationMessageHandler` asks `SimpUserRegistry` for the sessions of `{name}` and rewrites the destination to each session's unique queue (`/queue/x-user{sessionId}`). The broker delivers to the subscription the client created by subscribing to `/user/queue/x`.
+
+**O4. [M] Which Spring component sends STOMP heart-beats on the server?**
+The **broker**: `SimpleBrokerMessageHandler` (when a `TaskScheduler` is configured) or the external broker via the relay. There is **no** "HeartbeatInterceptor" class in Spring's STOMP support (see section P).
+
+**O5. [M] What changed for WebSocket/STOMP in Spring Framework 7 / Spring Security 7?**
+`MappingJackson2MessageConverter` is deprecated for removal and replaced by the Jackson 3 based `JacksonJsonMessageConverter`. Spring Security 7 **removed** `AbstractSecurityWebSocketMessageBrokerConfigurer` and `MessageSecurityMetadataSourceRegistry`, so you must use `@EnableWebSocketSecurity` with an `AuthorizationManager<Message<?>>`. (Spring 6.2 had already added `ChannelRegistration.executor(Executor)` for custom executors such as virtual threads.)
+
+**O6. [M] How do you run Spring's message channels on virtual threads?**
+Since 6.2: `registration.executor(new VirtualThreadTaskExecutor("ws-in-"))` in `configureClientInboundChannel` (and similarly for outbound). Load test it, and remember ordering still needs the preserve-order flags.
+
+**O7. [M] What happens when the simple broker's subscriber is too slow?**
+Messages queue in `ConcurrentWebSocketSessionDecorator`. Spring uses its `TERMINATE` overflow strategy and closes the session with `CloseStatus.SESSION_NOT_RELIABLE` (4500) when the send time or buffer limit is exceeded. The decorator also has a `DROP` strategy if you use it directly.
+
+**O8. [M] Does Spring Security protect outbound messages?**
+No. It secures only the `clientInboundChannel`; you protect data by authorising SUBSCRIBE frames. That's a performance decision, since one inbound message can fan out to thousands of outbound ones.
+
+**O9. [M] Why should clients be denied SUBSCRIBE to `/queue/**` directly?**
+Because user destinations resolve to `/queue/...-user{sessionId}` names. A client allowed to subscribe to `/queue/**` (or guess those names) could read other users' private messages. Allow `/user/queue/**` and deny the raw broker prefix.
+
+**O10. [M] How do typing indicators usually work in a chat design?**
+They are ephemeral events sent over the existing socket, rate-limited, never persisted. Server-side they're often a short-TTL key (e.g., 5 s in Redis) so no explicit "stopped typing" event is needed. They're the first thing to shed under load.
+
+**O11. [M] How is presence implemented at scale?**
+A per-user key with a short TTL refreshed by heart-beats/activity (offline when it expires, which handles crashes that never fire disconnect events), published as change events only to interested users. A user→gateway-node map (e.g., in Redis) lets you route private messages to the right node instead of broadcasting to all nodes.
+
+**O12. [S] How many WebSocket connections can one server handle?**
+There's no single number: it depends on memory per connection (kernel buffers, container buffers such as Tomcat's 8 KB per-session message buffers, framework objects, your state), message rate and fan-out. Public write-ups quote tens to hundreds of thousands per node. In an interview, state assumptions (e.g., ~20–50 KB per connection → ~20k–50k per GB of heap) and say you'd **measure** with a load test. Also mention OS limits (file descriptors), Tomcat's `max-connections` (Spring Boot default **8192**) and ephemeral ports.
+
+**O13. [S] With 10 million users, how do you route a message to the one gateway node holding the recipient's socket?**
+Keep a connection registry (userId → nodeId, with TTL) in Redis or a similar store. Producers publish to that node's channel/partition, not to all nodes. Alternatives: consistent hashing of users to gateway clusters, or Kafka partitions keyed by userId with each gateway consuming its assigned partitions.
+
+**O14. [M] What does `wasClean` in the browser close event mean?**
+`true` if the closing handshake completed (close frames exchanged); `false` if the connection dropped (typically code 1006).
+
+**O15. [M] Your WebSocket works through Nginx but drops at exactly 60 s, even with Nginx timeouts raised. What else?**
+Another hop: an AWS ALB in front (default idle timeout 60 s, configurable 1–4000 s), a corporate proxy, or the backend container's idle timeout. Heart-beats shorter than the smallest idle timeout fix all of them at once.
+
+**O16. [M] What are AWS API Gateway WebSocket limits worth knowing?**
+2-hour max connection duration, 10-minute idle timeout, 128 KB message payload, 32 KB frame size (non-adjustable). An oversized message closes the connection with 1009. It doesn't speak STOMP natively.
+
+**O17. [M] Why might a GCP HTTPS load balancer drop WebSockets after 30 seconds?**
+Its backend service timeout (default 30 s) acts as the maximum WebSocket connection lifetime. Raise it (e.g., 3600 s+).
+
+**O18. [M] Your company still runs the community ingress-nginx controller for WebSockets. Any concern?**
+Yes: it was retired in March 2026 (no more releases or security patches). Plan migration to a Gateway API implementation or another maintained controller, and re-verify WebSocket timeouts there.
+
+**O19. [M] What's the difference between `@SendToUser` with and without an authenticated user?**
+With a user: sent to that user's sessions (all, or only the current one with `broadcast = false`). Without a user: Spring falls back to the **current session id** and forces `broadcast = false`. If neither exists, it throws `MissingSessionUserException`.
+
+**O20. [M] Can a STOMP client receive messages for destinations it never subscribed to?**
+No. MESSAGE frames are only sent for active subscriptions (each carries the `subscription` id). A frame that arrives after a client-side unsubscribe reaches stompjs's `onUnhandledMessage`.
+
+**O21. [M] What's the role of `ExecutorChannelInterceptor`?**
+Its `beforeHandle`/`afterMessageHandled` run on the thread that actually handles the message (the executor thread). That's the right place to set and clear `ThreadLocal`s such as the security context, MDC logging keys or tenant context. `preSend` runs on the sending thread.
+
+**O22. [S] How do you version a real-time API used by mobile apps that update slowly?**
+Use an envelope with `type` and `version`; make additive changes only; clients ignore unknown fields/types; the client sends its version in CONNECT headers so the server can adapt or reject; track client versions in metrics; keep old formats until usage is negligible. Document everything in AsyncAPI.
+
+**O23. [M] How would you test that a subscription is active before sending in an integration test?**
+Use STOMP receipts (`setAutoReceipt(true)` + `addReceiptTask`) where supported, a round-trip ping through the same session, or Awaitility polling `SimpUserRegistry#findSubscriptions`. Avoid fixed sleeps.
+
+**O24. [M] Why is RabbitMQ's `/queue/<name>` risky for Spring user destinations?**
+RabbitMQ creates `/queue/` queues as **durable, non-exclusive, non-auto-deleted** by default, so per-session user queues (`/queue/x-user{sessionId}`) pile up after sessions end. Use `/exchange/amq.direct/...` (auto-delete) or expiry policies.
+
+**O25. [S] How do you do a zero-downtime broker (RabbitMQ) upgrade under the relay?**
+Cluster RabbitMQ with quorum queues for durable data; upgrade node by node; front the cluster with a TCP LB or rotate addresses in a custom `TcpClient`; Spring's relay reconnects its system session every 5 s and publishes `BrokerAvailabilityEvent`; clients get disconnected sessions and reconnect with jitter; verify user-destination queues and bindings come back.
+
+**O26. [M] What does `heartbeatToleranceMultiplier` do in stompjs?**
+The client treats the server as dead if no data arrives within `multiplier × incoming heart-beat interval` (default 2). Raise it for flaky mobile networks or throttled background tabs.
+
+**O27. [M] How do you avoid a reconnect storm with stompjs?**
+Use `reconnectTimeMode: ReconnectionTimeMode.EXPONENTIAL` with `maxReconnectDelay`, and add your own randomness (stompjs doesn't add jitter), e.g., a random initial `reconnectDelay` per client or adjusting it in `onWebSocketClose`.
+
+**O28. [S] Where do you terminate TLS for WebSockets and why?**
+Usually at the load balancer (offloads CPU/memory, central cert management); re-encrypt to the backend in zero-trust networks. Consider per-connection TLS memory cost if terminating on the app nodes.
+
+**O29. [M] What's the difference between `SessionConnectEvent` and `SessionConnectedEvent`?**
+`SessionConnectEvent` fires when the client's CONNECT arrives (has the native CONNECT headers). `SessionConnectedEvent` fires after the broker has answered with CONNECTED; the original CONNECT is in its `simpConnectMessage` header.
+
+**O30. [M] Is `@ServerEndpoint` how Spring Boot does STOMP?**
+No. `@ServerEndpoint` and `@ClientEndpoint` are **Jakarta WebSocket (JSR 356)** annotations for raw WebSocket endpoints. Spring STOMP uses `@EnableWebSocketMessageBroker`, `@MessageMapping` and friends (see Appendix A).
+
+---
+
+## P. Common wrong answers you will find online (don't repeat them)
+
+| Wrong claim | Correct answer |
+|-------------|----------------|
+| "Spring Boot sends STOMP heart-beats through a `HeartbeatInterceptor`." | No such Spring STOMP class. Heart-beats are negotiated in CONNECT/CONNECTED and sent by the broker (simple broker with a `TaskScheduler`, or the external broker via the relay) and by clients. |
+| "Spring Boot creates STOMP endpoints with `@ServerEndpoint`/`@ClientEndpoint`." | Those are Jakarta WebSocket (JSR 356) annotations for raw WebSocket. STOMP uses `@EnableWebSocketMessageBroker` + `@MessageMapping`. |
+| "`Sec-WebSocket-Key` secures the connection." | It only proves the server speaks WebSocket. Security = TLS + Origin + auth. |
+| "Masking encrypts client data." | It prevents proxy cache poisoning; the key is sent in clear. |
+| "CORS protects WebSocket endpoints." | CORS doesn't apply; check `Origin` (CSWSH). |
+| "The simple broker supports acks/redelivery." | It doesn't support acks, receipts (except DISCONNECT) or transactions. |
+| "WebSocket guarantees delivery because it's on TCP." | Only while the connection lives; disconnects lose messages. You need ids, resync and persistence. |
+| "Use HTTP/2 Server Push for real-time." | It was for cache preloading and has been removed from Chrome. |
+| "1006 is sent by the server when something fails." | 1006 is never sent; it's reported locally when the connection dropped without a close frame. |
+| "Sticky sessions are always required for WebSockets." | Only for SockJS HTTP fallbacks (or app-specific reconnect state). |
+| "Set `maxPoolSize` to scale Spring's inbound channel." | With the default unbounded queue the pool never grows past `corePoolSize`. |
+| "`AbstractSecurityWebSocketMessageBrokerConfigurer` is the way to secure messages." | Deprecated in 5.8/6 and removed in Spring Security 7. |
+
+
 Back to the [README](README.md) · Next: [Chapter 13: Cheat Sheet & Glossary](13-cheatsheet-glossary.md)

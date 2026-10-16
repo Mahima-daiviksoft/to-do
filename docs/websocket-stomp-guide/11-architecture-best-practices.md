@@ -334,7 +334,7 @@ Runbook entries (each with symptoms, dashboards, mitigation, escalation):
 ### 11.10.4 From legacy `stomp.js` (`Stomp.over`) to `@stomp/stompjs`
 `Stomp.over(socket)` → `new Client({ webSocketFactory | brokerURL })`; `connect(headers, cb)` → `connectHeaders` + `onConnect`; `send(dest, headers, body)` → `publish({ destination, headers, body })`; `disconnect` → `deactivate`; move subscriptions into `onConnect`.
 
-### 11.10.5 From `AbstractSecurityWebSocketMessageBrokerConfigurer` to `@EnableWebSocketSecurity`
+### 11.10.5 From `AbstractSecurityWebSocketMessageBrokerConfigurer` to `@EnableWebSocketSecurity` (mandatory for Spring Security 7, where the old class is removed)
 Replace `configureInbound(MessageSecurityMetadataSourceRegistry)` rules with an `AuthorizationManager<Message<?>>` bean built from `MessageMatcherDelegatingAuthorizationManager.Builder`; handle CSRF (on by default); keep your CONNECT auth interceptor ordered before security.
 
 ---

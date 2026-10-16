@@ -79,7 +79,7 @@ class ChatIntegrationTest {
     @BeforeEach
     void setup() {
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter()); // Spring 7: JacksonJsonMessageConverter
     }
 
     @AfterEach
@@ -238,7 +238,7 @@ class RelayIT {
 | C6 | CONNECTED received but heart-beat header is `0,0` | Simple broker without TaskScheduler; or client sent `0,0` | Configure `setTaskScheduler` + `setHeartbeatValue` |
 | C7 | `BeanCurrentlyInCreationException` / circular dependency when injecting TaskScheduler | Scheduler depends on message broker config | Dedicated scheduler bean or `@Lazy` injection |
 | C8 | Old client gets ERROR on ACK | Client sends 1.1-style ACK (`message-id`/`subscription`) to a 1.2 session | Use 1.2 `id` = MESSAGE `ack` header (update library) |
-| C9 | ERROR "Broker not available" / `MessageDeliveryException: Message broker not active` | Relay can't reach broker (down, wrong host/port, credentials, network policy, reactor-netty missing) | Check `BrokerAvailabilityEvent` logs, broker connectivity, credentials, add `spring-boot-starter-reactor-netty` |
+| C9 | ERROR "Broker not available" / `MessageDeliveryException: Message broker not active` | Relay can't reach broker (down, wrong host/port, credentials, network policy, reactor-netty missing) | Check `BrokerAvailabilityEvent` logs, broker connectivity, credentials, add `io.projectreactor.netty:reactor-netty` + `io.netty:netty-all` |
 
 ### D. Routing & delivery problems
 
@@ -301,8 +301,8 @@ class RelayIT {
 | G6 | React Native: frames garbled / never CONNECTED | NULL byte truncation | `forceBinaryWSFrames: true`, `appendMissingNULLonIncoming: true` |
 | G7 | Old tutorial code `Stomp.over(...)` doesn't reconnect | Legacy API with a socket instance | Migrate to `new Client({...})` + `activate()` |
 | G8 | Token visible in logs | `debug` enabled in production, or token in URL | Disable debug; CONNECT headers; redact |
-| G9 | Background tab stops receiving / timers throttled | Browser throttles timers in background tabs; heart-beats may be delayed | Use stompjs's worker-based heart-beat ticker option if available in your version; generous heart-beat tolerances; resync on `visibilitychange` |
-| G10 | App reconnect hammering after server outage | Fixed short `reconnectDelay` across all clients | Exponential backoff + jitter (adjust `reconnectDelay` in `onWebSocketClose`) |
+| G9 | Background tab stops receiving / timers throttled | Browser throttles timers in background tabs; heart-beats may be delayed | stompjs: `heartbeatStrategy: TickerStrategy.Worker` (heart-beats from a Web Worker), raise `heartbeatToleranceMultiplier`; resync on `visibilitychange` |
+| G10 | App reconnect hammering after server outage | Fixed short `reconnectDelay` across all clients | stompjs: `reconnectTimeMode: ReconnectionTimeMode.EXPONENTIAL` + `maxReconnectDelay`. It adds no jitter, so also randomise `reconnectDelay` per client (e.g., `1000 + Math.random()*4000`) |
 
 ---
 

@@ -153,7 +153,14 @@ public class PriceConflator {
 * Default core size = 2 × CPUs. For I/O-bound handlers, either **increase the pool** (e.g., 50–200) or **offload** to another executor and reply asynchronously (return `CompletableFuture`).
 * Set a **bounded queue** + rejection policy for back-pressure on inbound traffic only if you have a plan for rejected messages (clients must retry).
 * `clientOutboundChannel` mostly writes to sockets. Thread count rarely needs to be high unless clients are slow (limits handle that).
-* Java 21 **virtual threads**: Spring Boot 3.2+ can use virtual threads (`spring.threads.virtual.enabled=true`) for many executors. Whether the WebSocket message channels pick them up depends on your Spring version/configuration. Check `ChannelRegistration` options in your version and **load test**: virtual threads help blocking handlers but don't fix slow clients or fan-out costs.
+* Java 21 **virtual threads**: since **Spring Framework 6.2**, `ChannelRegistration.executor(Executor)` lets you plug any `Executor` into a channel (it takes precedence over `taskExecutor()` settings). Example:
+  ```java
+  @Override
+  public void configureClientInboundChannel(ChannelRegistration r) {
+      r.executor(new VirtualThreadTaskExecutor("ws-in-"));   // org.springframework.core.task.VirtualThreadTaskExecutor
+  }
+  ```
+  **Load test** before adopting: virtual threads help handlers that block on I/O, but they don't fix slow clients or fan-out costs. Keep `setPreservePublishOrder`/`setPreserveReceiveOrder` in mind, since ordering is still not guaranteed across threads.
 * Watch `WebSocketMessageBrokerStats` (`queued tasks`) or custom metrics on executor queue sizes.
 
 ```java

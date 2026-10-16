@@ -52,7 +52,8 @@ the **external message broker** (RabbitMQ, ActiveMQ) or a **backplane** (Redis, 
 * Frames from clients to broker destinations (`/topic/**`, `/queue/**`) are **forwarded** as-is; MESSAGE frames from the broker are forwarded back to the right WebSocket session.
 * Client heart-beats are negotiated **with the broker** (the relay passes the client's heart-beat header through).
 * If the system connection drops, Spring publishes **`BrokerAvailabilityEvent(false)`**, `SimpMessagingTemplate` sends fail with `MessageDeliveryException` ("Message broker not active"), and new client CONNECTs get an ERROR. Spring reconnects automatically (every 5 s by default).
-* Requires **Reactor Netty** on the classpath (`spring-boot-starter-reactor-netty` or `io.projectreactor.netty:reactor-netty`).
+* Requires **Reactor Netty** on the classpath. Spring's reference docs say to add `io.projectreactor.netty:reactor-netty` and `io.netty:netty-all`.
+* Defaults from the Spring source: `clientLogin`/`clientPasscode`/`systemLogin`/`systemPasscode` = `guest`; system heart-beats `10000` ms both ways; the system connection reconnects every **5 s** (`FixedIntervalReconnectStrategy(5000)`).
 
 > **Capacity implication:** 50,000 WebSocket users across your app instances = **~50,000 TCP connections to
 > the broker**. Size the broker (file descriptors, memory, Erlang process limits for RabbitMQ) accordingly. If
@@ -158,8 +159,8 @@ rabbitmq-plugins enable rabbitmq_web_stomp    # STOMP over WebSocket, port 15674
 | `x-stream-offset` | SUBSCRIBE | Where to start reading a stream queue |
 
 ### 7.5.3 User destinations with RabbitMQ (avoid queue leaks)
-Spring's `/user/queue/x` becomes `/queue/x-user{sessionId}` → RabbitMQ creates a **durable-ish named queue per
-session** that may outlive the session. Spring's docs recommend using destinations that RabbitMQ makes
+Spring's `/user/queue/x` becomes `/queue/x-user{sessionId}` → RabbitMQ creates a named queue per session which, per RabbitMQ's docs, is **durable, non-exclusive and not auto-deleted by default** for `/queue/` destinations. So it can outlive the
+session and leak. Spring's docs recommend using destinations that RabbitMQ makes
 **auto-delete**, e.g. have clients subscribe to `/user/exchange/amq.direct/position-updates` and send with
 `convertAndSendToUser(user, "/exchange/amq.direct/position-updates", payload)`. Then the per-session queue
 is auto-deleted when the session ends. Alternatively set `x-expires`/policies on such queues. **Monitor queue
@@ -359,7 +360,7 @@ backend realtime
       # for SockJS fallbacks:
       nginx.ingress.kubernetes.io/affinity: "cookie"
   ```
-  (The community `ingress-nginx` controller has been announced for retirement; many clusters are moving to **Gateway API** implementations such as Envoy Gateway, Istio, NGINX Gateway Fabric, or cloud-native gateways. Check WebSocket timeout settings on whichever you use.)
+  (**The community `ingress-nginx` controller was retired in March 2026**: the Kubernetes project announced it in November 2025, and after March 2026 there are no further releases or security patches. Some vendors offer extended support. New setups should use a **Gateway API** implementation (e.g., Envoy Gateway, Istio, NGINX Gateway Fabric, Traefik, or your cloud's gateway). The same rules apply on any of them: WebSocket upgrade enabled, long idle/route timeouts, and affinity only for SockJS.)
 * **Istio/Envoy:** WebSocket upgrade supported; set route `timeout: 0s` (disabled) or long; idle timeouts via `DestinationRule`/`EnvoyFilter` (`idle_timeout`).
 * **HPA:** CPU-based autoscaling is a poor fit (idle connections use memory, not CPU). Scale on **connection count** or **memory** with custom metrics.
 * **Imbalance after scale-out:** new pods get no existing connections. Options: accept it; enforce a **max connection age** (server closes connections older than X hours with jitter, clients reconnect and spread); use least-connections balancing.

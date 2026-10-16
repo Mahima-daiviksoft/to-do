@@ -39,6 +39,9 @@ npm install sockjs-client
 
 ## 6.3 `@stomp/stompjs` v7: complete guide
 
+> Checked against `@stomp/stompjs` **7.5.0** (the latest release on npm at the time of writing). Option names
+> and defaults below are taken from the package source.
+
 ### 6.3.1 Basic usage
 
 ```ts
@@ -97,7 +100,12 @@ await client.deactivate();   // sends DISCONNECT, stops reconnecting
 | `disconnectHeaders` | `{}` | Headers for DISCONNECT |
 | `heartbeatIncoming` / `heartbeatOutgoing` | `10000` / `10000` | Heart-beat intervals in ms (see Chapter 4 negotiation) |
 | `reconnectDelay` | `5000` | Delay before reconnect; `0` disables auto-reconnect |
-| `reconnectTimeMode`, `maxReconnectDelay` | linear | (Newer v7 releases) exponential backoff support. Check your installed version's docs |
+| `reconnectTimeMode` | `ReconnectionTimeMode.LINEAR` | `EXPONENTIAL` doubles the delay after each failed attempt (no random jitter is added) |
+| `maxReconnectDelay` | 15 minutes | Cap for exponential mode (if set below `reconnectDelay`, it is raised to `reconnectDelay`) |
+| `heartbeatToleranceMultiplier` | `2` | Server considered dead after `multiplier × incoming interval` with no data |
+| `heartbeatStrategy` | `TickerStrategy.Interval` | `TickerStrategy.Worker` sends heart-beats from a Web Worker, which helps in throttled background tabs |
+| `onHeartbeatReceived` / `onHeartbeatLost` | – | Callbacks for heart-beat events (handy for "connection quality" UI and metrics) |
+| `onChangeState` | – | Activation state changes (`ACTIVE`, `DEACTIVATING`, `INACTIVE`) |
 | `connectionTimeout` | `0` (off) | Fail and retry if not CONNECTED within this time |
 | `beforeConnect` | – | **async** hook called before each (re)connect, the place to **refresh tokens** |
 | `onConnect`, `onDisconnect` | – | STOMP-level connected/disconnected |
@@ -458,7 +466,8 @@ Used for **service-to-service**, **integration tests**, **load tests**, and **de
 ```java
 WebSocketClient transport = new StandardWebSocketClient();       // JSR-356 client (e.g., Tomcat's)
 WebSocketStompClient stompClient = new WebSocketStompClient(transport);
-stompClient.setMessageConverter(new MappingJackson2MessageConverter());   // JSON (Jackson 2); see note for Spring 7
+stompClient.setMessageConverter(new MappingJackson2MessageConverter());   // Spring 6.x (Jackson 2)
+// Spring 7.x (Jackson 3): stompClient.setMessageConverter(new JacksonJsonMessageConverter());
 ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 scheduler.initialize();
 stompClient.setTaskScheduler(scheduler);                          // needed for heart-beats (& receipts timeouts)
@@ -485,7 +494,7 @@ session.send("/app/chat.send", new ChatMessage("hello from Java"));
 session.setAutoReceipt(true);
 StompSession.Receiptable r = session.send("/app/chat.send", new ChatMessage("with receipt"));
 r.addReceiptTask(() -> System.out.println("received by server"));
-r.addReceiptLostTask(() -> System.out.println("no receipt in time"));
+r.addReceiptLostTask(() -> System.out.println("no receipt in time"));   // receipt time limit defaults to 15 s (setReceiptTimeLimit); needs a TaskScheduler
 
 session.disconnect();
 ```
@@ -502,7 +511,9 @@ Notes:
 * `WebSocketStompClient` **does not auto-reconnect**. Implement it in `handleTransportError` with backoff.
 * SockJS from Java: `new SockJsClient(List.of(new WebSocketTransport(new StandardWebSocketClient()), new RestTemplateXhrTransport()))`.
 * For high connection counts in load tests, tune the JSR-356 client's buffers and use a dedicated thread pool.
-* Spring Framework 7 / Boot 4 move to Jackson 3. Use the Jackson 3 based converter if your project is on Jackson 3.
+* Spring Framework 7 / Boot 4 move to Jackson 3: `MappingJackson2MessageConverter` is deprecated for removal in 7.0. Use `JacksonJsonMessageConverter`.
+* `WebSocketStompClient`'s constructor sets heart-beats to `0,0`; calling `setTaskScheduler(...)` switches them to `10000,10000` (from the Spring source). It only sends a heart-beat when nothing else was sent.
+* Spring's docs advise that when you simulate **many** clients from one machine (load tests), you consider turning heart-beats off, because each connection schedules its own heart-beat tasks.
 
 ---
 

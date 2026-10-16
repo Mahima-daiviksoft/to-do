@@ -181,11 +181,13 @@ What this does:
 * Subscriptions only to allowed patterns.
 * **Deny by default** (`anyMessage().denyAll()`): new destinations are blocked until someone thinks about them.
 
-**Legacy configuration** (`AbstractSecurityWebSocketMessageBrokerConfigurer`, `configureInbound(MessageSecurityMetadataSourceRegistry)`) is **deprecated**. Migrate to `@EnableWebSocketSecurity` + `AuthorizationManager`.
+**Legacy configuration** (`AbstractSecurityWebSocketMessageBrokerConfigurer`, `configureInbound(MessageSecurityMetadataSourceRegistry)`) was deprecated in 5.8/6.x and is **removed in Spring Security 7**. Migrate to `@EnableWebSocketSecurity` + `AuthorizationManager`. If you still have SpEL-based rules, Spring Security offers `MessageExpressionAuthorizationManager` to ease migration.
+
+> Note from the Spring Security reference: Spring Security secures **only the `clientInboundChannel`**, not the outbound channel (for performance: one inbound message can fan out to many outbound ones). Secure **subscriptions**, not outgoing messages.
 
 ### 8.6.2 CSRF and `@EnableWebSocketSecurity`
 * By default, `@EnableWebSocketSecurity` requires a **CSRF token** in the CONNECT frame headers (because browser cookie-authenticated sessions are vulnerable to CSWSH). The client fetches the token (e.g., from a `/csrf` endpoint or a meta tag) and adds it to `connectHeaders` using the header name from the `CsrfToken` (commonly `X-CSRF-TOKEN` / `X-XSRF-TOKEN`). In Spring Security 6 the expected value is the masked (XOR-encoded) token form by default. Send the value your server's `CsrfToken` provides.
-* If you use **only header tokens (JWT in CONNECT)** and no cookies, CSRF provides little value. At the time of writing, `@EnableWebSocketSecurity` has no simple switch to disable CSRF. Spring Security's docs show the alternative: **don't use the annotation**, and register the components yourself:
+* If you use **only header tokens (JWT in CONNECT)** and no cookies, CSRF provides little value. The current Spring Security reference states: *"At this point, CSRF is not configurable when using `@EnableWebSocketSecurity`, though this will likely be added in a future release."* Spring Security's docs show the alternative: **don't use the annotation**, and register the components yourself:
 
 ```java
 @Configuration
