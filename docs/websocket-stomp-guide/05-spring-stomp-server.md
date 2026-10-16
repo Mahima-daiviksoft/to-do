@@ -704,6 +704,11 @@ processed out of order**. Options:
 
 * `registry.setPreservePublishOrder(true)` (`MessageBrokerRegistry`, 5.1+): messages published **to the same client session** from the broker are sent **in order** (one at a time per session). Small performance cost.
 * `registry.setPreserveReceiveOrder(true)` (`StompEndpointRegistry`, 6.1+): messages **from the same client session** are handed to the inbound channel in order.
+  > **Caveat (verified in Spring Framework 7.0.9 source and by test):** with this flag on, exceptions thrown by inbound
+  > `ChannelInterceptor`s (e.g., your JWT CONNECT check or subscription authorisation) are caught and **only logged** by
+  > `OrderedMessageChannelDecorator`. The message is dropped (so security holds), but **no STOMP ERROR frame is sent and the
+  > connection stays open**, so clients can't tell why nothing happened. Either avoid the flag when interceptors reject
+  > frames, or make clients time out CONNECT and handle it. (Bug Encyclopedia C10.)
 * Without these, if order matters, add a sequence number to messages and reorder/ignore stale ones on the client.
 
 ---

@@ -424,7 +424,7 @@ Destination header missing on SEND frame (receipt send-42)^@
 
 * `message` header: a short description. Body: details.
 * If the error relates to a frame with a `receipt` header, the ERROR should include `receipt-id`.
-* **The server MUST close the connection right after sending ERROR.** (STOMP 1.2 suggests the server **linger** briefly so the client actually receives the ERROR before the socket closes.)
+* **The server MUST close the connection right after sending ERROR.** (STOMP 1.2 suggests the server **linger** briefly so the client actually receives the ERROR before the socket closes.) Spring closes the WebSocket with close code **1002** (`CloseStatus.PROTOCOL_ERROR`) right after sending an ERROR frame.
 * So in STOMP, **an ERROR is fatal to the connection**. Not ideal for "validation failed" style app errors. In Spring, handle application errors with `@MessageExceptionHandler` and send an error **MESSAGE** to a user queue (e.g., `/user/queue/errors`) instead of letting it become a STOMP ERROR (Chapter 5).
 
 ---

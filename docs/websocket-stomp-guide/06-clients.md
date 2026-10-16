@@ -161,6 +161,19 @@ client.subscribe('/topic/bin', (m) => { const bytes = m.binaryBody; });
 
 ### 6.3.7 Token refresh before every connect
 
+> **Pitfall (verified in stompjs 7.5.0 source and by test): `beforeConnect` must never throw.** stompjs awaits it without a
+> try/catch. If your token refresh fails (auth server down, offline), the rejection is unhandled **and the reconnect loop
+> stops for good**. Always wrap it:
+> ```ts
+> beforeConnect: async () => {
+>   try { client.connectHeaders = { Authorization: `Bearer ${await getToken()}` }; }
+>   catch { /* keep old headers; this attempt fails and normal backoff retries */ }
+> },
+> ```
+> Also set `discardWebsocketOnCommFailure: true`, so an attempt stuck in CONNECTING (seen with Node's WebSocket) is dropped
+> and the next attempt starts.
+
+
 ```ts
 client.beforeConnect = async () => {
   const token = await authService.getFreshAccessToken();     // refresh if near expiry

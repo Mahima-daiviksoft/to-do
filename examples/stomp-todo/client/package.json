@@ -1,0 +1,21 @@
+{
+  "name": "stomp-todo-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reusable real-time to-do client (STOMP over WebSocket) for web, Node and React Native, plus a runnable demo",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "demo": "tsx src/demo.ts",
+    "resilience": "tsx src/resilience-demo.ts"
+  },
+  "dependencies": {
+    "@stomp/stompjs": "7.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

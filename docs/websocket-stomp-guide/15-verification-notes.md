@@ -48,6 +48,18 @@ environment used to write this book, so the facts were checked against **primary
 | RabbitMQ: STOMP port 61613; Web STOMP 15674 `/ws`; `/queue/` queues durable, non-exclusive, non-auto-delete by default; `/topic` subscribe queues auto-delete non-durable; durable subscriptions via `durable:true` + `auto-delete:false` (Ch 7) | RabbitMQ docs sources (stomp.md, web-stomp.md) |
 | WebSocket handshake Accept example `s3pPLMBiTxaQ9kYGzzhZRbK+xOo=` and masking example bytes (Ch 2) | Recomputed with OpenSSL/Python |
 
+## Behaviour verified by running the Appendix B sample (Spring Boot 4.1.1 / Spring Framework 7.0.9 / Spring Security 7, stompjs 7.5.0, Node 22)
+
+| Behaviour | How it was observed |
+|---|---|
+| JWT CONNECT auth, deny-by-default message rules, SUBSCRIBE membership checks, spoofed `/topic` SEND rejected | 11 passing integration tests with `WebSocketStompClient` |
+| ERROR frame is followed by a server-side close (code 1002) | `StompSubProtocolHandler#sendToClient` / `sendErrorMessage` + tests observing disconnects |
+| `setPreserveReceiveOrder(true)` → interceptor exceptions only logged, no ERROR, connection stays open | Failing tests, then `OrderedMessageChannelDecorator` source (7.0.9 and `main`) |
+| stompjs `beforeConnect` rejection stops reconnecting and is unhandled | Server-restart test + stompjs `_connect()` source |
+| Connection attempt stuck in CONNECTING after timeout is recovered by `discardWebsocketOnCommFailure` | Server-restart test with debug logs |
+| Exponential reconnect backoff doubles (2.2 s → 4.4 s), re-subscription, snapshot reload on sequence regression | Server-restart test |
+| Idempotent retries, ordered per-list `seq`, CONFLICT as MESSAGE with connection kept open, REST 403 for non-members | `npm run demo` against the live server |
+
 ## Facts confirmed by web search (secondary sources; re-check provider docs for your account/region)
 
 | Fact | Notes |

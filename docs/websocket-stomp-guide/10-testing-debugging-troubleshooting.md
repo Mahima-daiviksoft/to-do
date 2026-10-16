@@ -126,6 +126,7 @@ class ChatIntegrationTest {
 Tips:
 * **Race between SUBSCRIBE and SEND** is the #1 cause of flaky WebSocket tests. Use receipts (`session.setAutoReceipt(true)` + `subscribe(...).addReceiptTask(latch::countDown)`, where the server supports receipts), or a "ping" round-trip through the same session, or Awaitility polling of `SimpUserRegistry` subscriptions.
 * Use `BlockingQueue.poll(timeout)` or Awaitility, never fixed long sleeps.
+* Deterministic alternative used by the Appendix B sample: in tests, run the inbound channel with **one thread** (`registration.taskExecutor().corePoolSize(1)` behind a test property), so a session's frames are handled in arrival order. A round-trip `@SubscribeMapping` request then proves earlier SUBSCRIBEs are registered.
 * Test negative paths: forbidden subscriptions, invalid payloads → error queue, expired tokens.
 * Test **user destinations** with two sessions for the same user (both receive) and a different user (doesn't).
 
@@ -239,6 +240,8 @@ class RelayIT {
 | C7 | `BeanCurrentlyInCreationException` / circular dependency when injecting TaskScheduler | Scheduler depends on message broker config | Dedicated scheduler bean or `@Lazy` injection |
 | C8 | Old client gets ERROR on ACK | Client sends 1.1-style ACK (`message-id`/`subscription`) to a 1.2 session | Use 1.2 `id` = MESSAGE `ack` header (update library) |
 | C9 | ERROR "Broker not available" / `MessageDeliveryException: Message broker not active` | Relay can't reach broker (down, wrong host/port, credentials, network policy, reactor-netty missing) | Check `BrokerAvailabilityEvent` logs, broker connectivity, credentials, add `io.projectreactor.netty:reactor-netty` + `io.netty:netty-all` |
+| C10 | A rejected CONNECT/SUBSCRIBE (bad token, forbidden destination) gets **no ERROR frame**; the client hangs until its connect timeout; server logs `Failed to send GenericMessage [...]` from `OrderedMessageChannelDecorator` | `StompEndpointRegistry#setPreserveReceiveOrder(true)` is on. The ordering decorator catches and only **logs** exceptions thrown by inbound interceptors, so `StompSubProtocolHandler` never sends ERROR or closes the session (verified in Spring Framework 7.0.9 and `main`) | Don't combine `setPreserveReceiveOrder(true)` with rejecting interceptors, or make the client time out the CONNECT (`connectionTimeout`) and treat it as an auth failure. Found while testing the Appendix B sample |
+| C11 | Client sees close code **1002** right after an ERROR frame | Expected: Spring closes the session with `CloseStatus.PROTOCOL_ERROR` (1002) after any STOMP ERROR (default error path and custom `StompSubProtocolErrorHandler` alike) | Read the ERROR frame's `message` header for the reason; don't treat 1002 as a network problem |
 
 ### D. Routing & delivery problems
 
@@ -302,6 +305,9 @@ class RelayIT {
 | G7 | Old tutorial code `Stomp.over(...)` doesn't reconnect | Legacy API with a socket instance | Migrate to `new Client({...})` + `activate()` |
 | G8 | Token visible in logs | `debug` enabled in production, or token in URL | Disable debug; CONNECT headers; redact |
 | G9 | Background tab stops receiving / timers throttled | Browser throttles timers in background tabs; heart-beats may be delayed | stompjs: `heartbeatStrategy: TickerStrategy.Worker` (heart-beats from a Web Worker), raise `heartbeatToleranceMultiplier`; resync on `visibilitychange` |
+| G11 | Reconnecting **stops forever** after the auth server or token endpoint was briefly down; Node logs an unhandled rejection (`fetch failed`) | stompjs 7.x awaits `beforeConnect` **without try/catch** and calls `_connect()` with `void`. A throwing `beforeConnect` rejects, nothing schedules the next attempt | Wrap the token fetch in `beforeConnect` with try/catch (keep the old headers and let the attempt fail normally); add `onChangeState` monitoring |
+| G12 | After a server restart the client says "reconnecting" forever; debug shows `Connection not established in Nms, closing socket` and nothing after | The connection attempt got stuck in CONNECTING, and `close()` on it never produced a `close` event (observed with Node's built-in WebSocket), so no reconnect was scheduled | `discardWebsocketOnCommFailure: true` (stompjs drops the socket and synthesises the close → reconnect proceeds) |
+| G13 | Client keeps showing stale data after the server lost its state (restart with in-memory store, DB restore) | Resync asked for "events after seq N" but the server's sequence restarted below N and replied "nothing new" | Server must answer "reload" (e.g., HTTP 410) when the client's seq is **ahead** of its own; client then loads a full snapshot |
 | G10 | App reconnect hammering after server outage | Fixed short `reconnectDelay` across all clients | stompjs: `reconnectTimeMode: ReconnectionTimeMode.EXPONENTIAL` + `maxReconnectDelay`. It adds no jitter, so also randomise `reconnectDelay` per client (e.g., `1000 + Math.random()*4000`) |
 
 ---

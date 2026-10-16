@@ -1,0 +1,13 @@
+# RabbitMQ with the STOMP plugin, for running the server with app.broker.mode=relay.
+#   docker compose up -d
+#   management UI: http://localhost:15672  (stomp / stomp-dev-password)
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "61613:61613"
+    volumes:
+      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/90-stomp-todo.conf:ro

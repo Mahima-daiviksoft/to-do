@@ -26,6 +26,9 @@
 | 12 | [Interview Questions & Answers, Part 1](12-interview-questions.md): fundamentals, WebSocket, browser, STOMP, Spring | Answer the core technical questions with confidence |
 | 12b | [Interview Questions & Answers, Part 2](12-interview-questions-part2.md): security, scaling, reliability, debugging scenarios, system design, coding, rapid-fire, gotchas | Handle senior-level, scenario and design rounds |
 | 13 | [Cheat Sheet & Glossary](13-cheatsheet-glossary.md) | Look anything up in seconds |
+| A | [Appendix A: Beyond Spring STOMP](14-appendix-other-stacks.md): Jakarta WebSocket, raw Spring handlers, WebFlux, RSocket, Spring Session, Kafka gateway, HTTP/2, Node, Socket.IO, SignalR, Go, GraphQL subscriptions, Yjs, MQTT | Compare and integrate other stacks |
+| B | [Appendix B: Runnable sample project](../../examples/stomp-todo/README.md): Spring Boot 4 server + TypeScript/React Native client, 11 passing integration tests | Run, read and adapt working code |
+| C | [Appendix C: Verification notes & sources](15-verification-notes.md) | See what was checked, against what |
 
 ---
 

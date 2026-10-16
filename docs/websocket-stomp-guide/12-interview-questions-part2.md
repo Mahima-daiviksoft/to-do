@@ -371,6 +371,9 @@ See Chapter 8 §8.6.3: regex the destination, look up ownership, throw `AccessDe
 13. **"Will TCP tell me immediately when the client disappears?"** No; half-open connections need heart-beats.
 14. **"Does `maxPoolSize` grow Spring's inbound pool?"** Not with the default unbounded queue.
 15. **"Is SockJS a WebSocket implementation?"** It's an emulation layer with its own protocol, using WebSocket when possible.
+16. **"Does turning on `setPreserveReceiveOrder(true)` change error behaviour?"** Yes (Spring 7.0.x): exceptions from inbound interceptors are only logged, so no ERROR frame is sent and the connection stays open.
+17. **"What close code does a Spring STOMP client see after an ERROR frame?"** 1002 (`PROTOCOL_ERROR`); Spring closes the session after sending ERROR.
+18. **"What happens if stompjs's `beforeConnect` throws?"** In 7.x the rejection is unhandled and no further reconnect is scheduled, so always catch inside it.
 
 ---
 

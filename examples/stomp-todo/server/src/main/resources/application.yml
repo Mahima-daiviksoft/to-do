@@ -1,0 +1,39 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+app:
+  jwt:
+    # HS256 secret, at least 32 bytes. DEV ONLY: inject a real secret (or use an IdP's JWKS) in production.
+    secret: "dev-only-secret-change-me-0123456789-abcdefghij"
+    ttl: 1h
+  # Enables POST /api/dev-token so the demo client can obtain tokens without an identity provider.
+  dev-tokens: true
+  allowed-origin-patterns:
+    - "http://localhost:[*]"
+    - "http://127.0.0.1:[*]"
+  broker:
+    mode: simple          # simple | relay
+    relay:
+      host: localhost
+      port: 61613
+      virtual-host: /
+      client-login: guest
+      client-passcode: guest
+      system-login: guest
+      system-passcode: guest
+  limits:
+    messages-per-second: 20
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    org.springframework.web.socket.config.WebSocketMessageBrokerStats: INFO
+    # Uncomment while debugging (very verbose):
+    # org.springframework.messaging: DEBUG
+    # org.springframework.web.socket: DEBUG
