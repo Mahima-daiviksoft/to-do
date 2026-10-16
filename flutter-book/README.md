@@ -75,6 +75,18 @@
 | 32 | [Coding Rounds & Behavioral](32-coding-rounds-machine-coding-and-behavioral.md) | 24 Dart problems, output puzzles, full machine-coding apps, STAR answers |
 | 33 | [Cheat Sheets, Glossary & Roadmap](33-cheatsheets-glossary-and-roadmap.md) | Cheat sheets, deprecated-API table, version timeline, glossary, study plan |
 
+### Part VII — Deep Dives with Full Code
+| # | Chapter | What you'll learn |
+|---|---|---|
+| 34 | [Camera, Images, Video & Audio](34-camera-images-video-audio.md) | image_picker, compression, a custom camera screen with correct lifecycle, video_player/chewie, video feeds, just_audio/background audio, recording, uploads |
+| 35 | [Maps & Location](35-maps-and-location.md) | Permissions, geolocator, background tracking, geocoding, Google Maps (markers, routes, clustering), flutter_map/OSM, geofencing, battery |
+| 36 | [In-App Purchases & Payments](36-in-app-purchases-and-payments.md) | in_app_purchase flow, server verification & subscriptions, RevenueCat, Stripe Payment Sheet, Razorpay, Google/Apple Pay |
+| 37 | [State Restoration, Custom Slivers & Advanced Widgets](37-state-restoration-slivers-advanced-widgets.md) | RestorationMixin, restorable navigation, writing a RenderSliver, DataTable/PaginatedDataTable/TableView, OverlayPortal, SearchAnchor, Autocomplete, Stepper |
+| 38 | [Code Generation & Publishing Packages](38-code-generation-and-publishing-packages.md) | build_runner, build.yaml, writing a source_gen generator, pub points, publishing, automated publishing, plugin publishing rules |
+| 39 | [Release Automation & Patrol](39-release-automation-fastlane-codemagic-patrol.md) | Complete fastlane Fastfiles (iOS/Android), GitHub Actions release workflow, codemagic.yaml, Patrol E2E with native dialogs |
+| 40 | [Flame Games, Advanced FFI & Stream Transformers](40-games-flame-advanced-ffi-stream-transformers.md) | A complete Flame mini-game, FFI structs/memory/callbacks/ffigen/jnigen/native assets, custom debounce & switchMap transformers |
+| 41 | [Q&A: 120 Extra Questions](41-interview-questions-extra-bank.md) | New questions across Dart corners, UI, architecture, media/maps/payments, tooling, release and teams |
+
 ---
 
 ## 🗺️ Suggested study plans
