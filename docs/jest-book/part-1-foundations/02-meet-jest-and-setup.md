@@ -13,7 +13,7 @@
 
 | Jest | Node.js supported | TypeScript (for Jest's types) |
 | --- | --- | --- |
-| **30.x** | 18.x, 20.x, 22.x, 24+ (dropped 14, 16, 19, 21) | ≥ 5.4 |
+| **30.x** | 18.x, 20.x, 22.x, 24+ (dropped 14, 16, 19, 21; the changelog also lists 23) | ≥ 5.4 |
 | 29.x | 14.15+, 16.10+, 18+ | ≥ 4.3 |
 
 📌 **Version note:** If `npm install jest` gives you errors on an old Node, upgrade Node first.
