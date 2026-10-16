@@ -329,6 +329,22 @@ apply (`connection`, `connect`, `new_namespace`).
 
 ## 8.7 Load balancer and reverse proxy configuration
 
+> **Lab-verified (October 2026):** the nginx and HAProxy configurations in this section were
+> run (nginx 1.24, HAProxy 2.8) in front of three Socket.IO 4.8.4 nodes sharing the Redis
+> adapter. Results:
+>
+> | Setup | Result |
+> |---|---|
+> | nginx config below (hash on client IP, Upgrade headers) | connected, **upgraded to WebSocket** |
+> | HAProxy round-robin + `cookie SERVERID insert`, polling-only client with `withCredentials: true` | connected every time, connections spread over nodes 5001/5002/5003 |
+> | Same HAProxy, client **without** `withCredentials` | **failed** every time (`xhr poll error` / `xhr post error`); nodes logged `engine error code=1 Session ID unknown` — the LB cookie wasn't sent back, so requests landed on random nodes |
+> | HAProxy round-robin **without** stickiness, polling-only | **failed**: `Session ID unknown` (code 1) |
+> | HAProxy round-robin without stickiness, **WebSocket-only** client | connected — no stickiness needed |
+> | Client on node 5001 broadcasts, client on node 5002 listening | received via the Redis adapter |
+>
+> The full lab (configs, node script, test script) is in Chapter 23 so you can reproduce it.
+
+
 ### nginx
 
 ```nginx
