@@ -45,6 +45,7 @@ The mock looks at **saved examples** in the collection. For an incoming request 
 4. Picks the **highest-scoring** example; if none matches → 404 error JSON ("mockRequestNotFoundError").
 
 ### 12.4 Control headers (send these in your request to the mock)
+
 | Header | Effect |
 |---|---|
 | `x-api-key: <Postman API key>` | Required for **private** mocks |
@@ -67,6 +68,7 @@ x-mock-response-code: 500
 - **Network delay simulation** (fixed delay, e.g. 2G/3G or custom ms) to test loading spinners/timeouts.
 
 ### 12.6 Mock limitations & tips
+
 | Limitation | Tip |
 |---|---|
 | Stateless: POST doesn't really create anything; GET after POST returns the saved example | For stateful fakes use a local tool (WireMock, json-server, Prism, MockServer) |
@@ -85,6 +87,7 @@ v12 also introduced **code mocks / simulations** usable from the Postman CLI (e.
 
 ### 12.7 Creating a monitor
 Collection `...` → **Monitor collection** (or sidebar → Monitors → `+`):
+
 | Setting | Meaning |
 |---|---|
 | Collection & environment | What to run, with which variables |
@@ -116,6 +119,7 @@ Monitors run in Postman's cloud. For private/internal APIs: expose via gateway w
 ## PART C — API DESIGN: SPEC HUB / API BUILDER
 
 ### 12.11 Design-first vs code-first
+
 | Design-first | Code-first |
 |---|---|
 | Write the **OpenAPI** contract first, review, mock, then implement | Write code, generate the spec from code (Swagger annotations, springdoc, FastAPI) |
@@ -224,6 +228,7 @@ Key parts: `openapi`, `info`, `servers`, `paths` → operations (`get/post/...`)
 - Rate limits and monthly usage limits depend on plan; responses include rate-limit headers.
 
 ### 12.20 Common endpoints
+
 | Endpoint | Purpose |
 |---|---|
 | `GET /me` | Who am I (validate key) |

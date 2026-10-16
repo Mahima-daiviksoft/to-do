@@ -152,6 +152,7 @@ Click **Save Response → Save as example**. An **example** stores a request + r
 - Disable per request with Settings → **Disable cookie jar**.
 
 Common cookie-related bugs:
+
 | Symptom | Cause | Fix |
 |---|---|---|
 | Logged-out API still returns data | Old session cookie still in jar | Delete cookies for domain |

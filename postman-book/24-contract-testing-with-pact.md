@@ -128,6 +128,7 @@ In a corporate or CI network with an HTTP(S) proxy, the Pact verifier (a native 
 ---
 
 ## 24.4 Pact concepts to know for interviews
+
 | Concept | Meaning |
 |---|---|
 | **Consumer / Provider** | API client / API server |

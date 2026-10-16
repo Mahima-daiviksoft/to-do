@@ -23,6 +23,7 @@
 - Works well with SCIM and auto-flex billing (seats added automatically as people join).
 
 ### 23.4 Roles (typical)
+
 | Level | Roles (names vary by plan/version) | What they control |
 |---|---|---|
 | **Team** | Admin, Billing, Developer (member), **Community Manager** (manages everything the team made public), Partner Manager (partner workspaces) | Team settings, security, billing, public presence |

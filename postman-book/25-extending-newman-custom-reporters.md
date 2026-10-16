@@ -81,6 +81,7 @@ Real output from the verification run:
 ---
 
 ## 25.4 Useful emitter events & data
+
 | Event | `args` highlights |
 |---|---|
 | `start` | run starting |

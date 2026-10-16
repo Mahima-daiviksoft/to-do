@@ -50,6 +50,7 @@ Collections are the **unit of everything** in Postman:
 ```
 
 Alternative organisation patterns:
+
 | Pattern | When |
 |---|---|
 | **By resource** (Users, Orders, Products) | API reference / dev collections |

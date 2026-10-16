@@ -9,6 +9,7 @@
 - Drag a collection/folder into the Runner.
 
 ## 10.2 Run modes
+
 | Mode | What |
 |---|---|
 | **Run manually** | Run now in the app (your machine, your network) |
@@ -17,6 +18,7 @@
 | **Performance** | Load test with virtual users (10.8) |
 
 ## 10.3 Runner configuration (functional mode)
+
 | Option | Meaning |
 |---|---|
 | **Request selection/order** | Tick/untick requests; drag to reorder for this run |
@@ -111,6 +113,7 @@ The Runner applies one data file to the whole run. Options:
 ---
 
 ## 10.7 Common Runner problems
+
 | Problem | Cause | Fix |
 |---|---|---|
 | Variables not updated after run | "Keep variable values" off; or values only set locally | Enable option; check scope |
@@ -128,6 +131,7 @@ The Runner applies one data file to the whole run. Options:
 > 🧒 Instead of 1 kid knocking on the shop door, imagine **100 kids knocking at once**. Does the shopkeeper still answer quickly? That's load testing.
 
 Runner → **Performance** tab (exact capabilities/limits depend on your plan and version):
+
 | Setting | Meaning |
 |---|---|
 | **Virtual users (VUs)** | Number of concurrent simulated users, each running the selected requests in a loop |

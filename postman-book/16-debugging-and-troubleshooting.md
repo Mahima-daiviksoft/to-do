@@ -15,6 +15,7 @@
 7. **Write down the fix** in the collection docs/wiki so the team never loses time on it again.
 
 ### Classifying the problem
+
 | Where it fails | Typical signs |
 |---|---|
 | **Before sending** (Postman/scripts/variables) | Script errors, red variables, "Invalid URL" |
@@ -44,6 +45,7 @@
 | Request hangs forever with "Sending request..." | Timeout = 0 (infinite) and server never responds; proxy waiting for auth | Set timeout; check proxy settings |
 
 ### `localhost` gotchas
+
 | Situation | Problem | Fix |
 |---|---|---|
 | Postman **web** app → `localhost` | Cloud agent can't reach your machine | Use **Desktop Agent** or desktop app |
@@ -72,6 +74,7 @@
 ---
 
 ## 16.4 Proxy problems
+
 | Symptom | Fix |
 |---|---|
 | Works on home Wi-Fi, fails in office | Configure **Settings → Proxy**: use system proxy, or custom proxy host/port, proxy auth (407 errors) |
@@ -194,6 +197,7 @@ Gateway/upstream issues: service down, deployment in progress, timeouts; retry l
 ---
 
 ## 16.9 Cookies & session problems
+
 | Symptom | Fix |
 |---|---|
 | Logged in as wrong user | Clear cookie jar for domain; check `Cookie` header in Console |
@@ -237,6 +241,7 @@ See Chapter 6.8 table (`invalid_client`, `invalid_grant`, `redirect_uri_mismatch
 ---
 
 ## 16.13 Postman app problems
+
 | Problem | Fix |
 |---|---|
 | App slow / high memory | Close unused tabs; clear History; disable response saving in Runner; reduce Console logs; large responses → Raw view; update app |

@@ -9,6 +9,7 @@ Postman's **New** menu offers dedicated request types: **HTTP**, **GraphQL**, **
 > 🧒 REST is a **set menu**: you get the whole plate even if you only want the fries. GraphQL is a **buffet**: you pick exactly what goes on your plate.
 
 ### Core concepts
+
 | Concept | Meaning |
 |---|---|
 | **Schema (SDL)** | Typed description of everything you can ask for |
@@ -86,6 +87,7 @@ message Order { int64 id = 1; string status = 2; double total = 3; }
 ```
 
 ### Four method types
+
 | Type | Request | Response |
 |---|---|---|
 | Unary | one | one |
@@ -107,6 +109,7 @@ pm.test("gRPC OK", () => pm.response.to.have.statusCode(0));
 (Check the gRPC scripting reference for your version for the full assertion list.)
 
 ### gRPC status codes (memorise top ones)
+
 | Code | Name | HTTP-ish analogy |
 |---|---|---|
 | 0 | OK | 200 |
@@ -128,6 +131,7 @@ pm.test("gRPC OK", () => pm.response.to.have.statusCode(0));
 | 16 | UNAUTHENTICATED | 401 |
 
 ### Common gRPC problems
+
 | Problem | Fix |
 |---|---|
 | "Could not load server reflection" | Server doesn't enable reflection → import `.proto` |

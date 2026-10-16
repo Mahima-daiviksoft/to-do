@@ -21,6 +21,7 @@ POST {{baseUrl}}/payments
 ```
 
 ### Which scope to store chained values in?
+
 | Scope | Pros | Cons |
 |---|---|---|
 | **Collection variable** | Travels with collection; independent of environment | Shared across environments (stale value when switching env) |

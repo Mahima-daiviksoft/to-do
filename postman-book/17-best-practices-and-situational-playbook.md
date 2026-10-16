@@ -133,6 +133,7 @@ Export v2.1 JSON or use Native Git YAML; tests in `pm.*` only run in Postman-com
 ---
 
 ## 17.3 Postman vs other tools (know when to use what)
+
 | Tool | Type | When better than Postman |
 |---|---|---|
 | **cURL / HTTPie** | CLI | Quick one-offs, scripts, servers without GUI |
@@ -149,6 +150,7 @@ Export v2.1 JSON or use Native Git YAML; tests in `pm.*` only run in Postman-com
 ---
 
 ## 17.4 A maturity model for API testing with Postman
+
 | Level | Characteristics |
 |---|---|
 | 0 — Ad hoc | Random requests in personal workspaces, no tests |

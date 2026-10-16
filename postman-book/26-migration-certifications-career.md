@@ -13,6 +13,7 @@
 6. **Switch CI** (Newman/Postman CLI), then **archive** the old suite (read-only) for a retention period.
 
 ### 26.2 SoapUI / ReadyAPI → Postman
+
 | SoapUI concept | Postman equivalent |
 |---|---|
 | Project | Workspace / collection |
@@ -50,6 +51,7 @@ pm.test("AddResult is 12", () => pm.expect($("AddResult").text()).to.eql("12"));
 
 ### 26.6 Postman → code frameworks (REST Assured, Playwright, pytest)
 Teams move when they need complex logic, shared code with the app, or very large suites.
+
 | Postman | REST Assured (Java) | Playwright API (TS) | pytest + requests (Python) |
 |---|---|---|---|
 | `pm.response.to.have.status(200)` | `.then().statusCode(200)` | `expect(res.status()).toBe(200)` | `assert r.status_code == 200` |
@@ -84,6 +86,7 @@ See Chapter 21.8 (playbook).
 ## PART C — Career growth with Postman skills
 
 ### 26.10 Skills matrix
+
 | Level | You can… |
 |---|---|
 | **Beginner** | Send requests, use params/headers/body, read status codes, save collections, basic tests |

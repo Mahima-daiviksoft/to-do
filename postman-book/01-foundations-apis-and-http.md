@@ -44,6 +44,7 @@ An API is a **contract** between a provider and a consumer. It defines:
 ## 1.2 Types of APIs
 
 ### By who can use them
+
 | Type | Meaning | Example |
 |---|---|---|
 | **Public / Open API** | Anyone can use (sometimes with a free key) | GitHub API, OpenWeatherMap |
@@ -52,6 +53,7 @@ An API is a **contract** between a provider and a consumer. It defines:
 | **Composite API** | One call that combines many calls | "Get user + orders + cart" in one go |
 
 ### By architectural style / protocol
+
 | Style | Data format | Transport | Key idea |
 |---|---|---|---|
 | **REST** | Usually JSON (also XML, etc.) | HTTP | Resources (nouns) + HTTP methods (verbs) |
@@ -210,6 +212,7 @@ Technically HTTP doesn't forbid it, but RFC 9110 says a body in GET has **no def
 > 🧒 Status codes are like **traffic signals and faces**: 2xx = 😀 "All good", 3xx = 👉 "Go over there", 4xx = 🙅 "**You** made a mistake", 5xx = 🤒 "**I** (the server) am sick".
 
 ### 1xx — Informational
+
 | Code | Name | Meaning |
 |---|---|---|
 | 100 | Continue | Server got the headers; client may send the body (used with `Expect: 100-continue`) |
@@ -218,6 +221,7 @@ Technically HTTP doesn't forbid it, but RFC 9110 says a body in GET has **no def
 | 103 | Early Hints | Preload hints before the final response |
 
 ### 2xx — Success
+
 | Code | Name | When to use |
 |---|---|---|
 | **200** | OK | Generic success, body included |
@@ -229,6 +233,7 @@ Technically HTTP doesn't forbid it, but RFC 9110 says a body in GET has **no def
 | **206** | Partial Content | Range requests (video streaming, resumable downloads) |
 
 ### 3xx — Redirection
+
 | Code | Name | Notes |
 |---|---|---|
 | 300 | Multiple Choices | |
@@ -242,6 +247,7 @@ Technically HTTP doesn't forbid it, but RFC 9110 says a body in GET has **no def
 > **Postman setting:** "Automatically follow redirects" (Settings → General, and per-request in the request's **Settings** tab). Turn it **off** to see the real 3xx response and its `Location` header — very useful for testing login flows.
 
 ### 4xx — Client Errors (the most-tested group)
+
 | Code | Name | Typical cause | How to fix (from Postman) |
 |---|---|---|---|
 | **400** | Bad Request | Malformed JSON, missing required field, validation failed | Check body syntax, `Content-Type`, required fields |
@@ -272,6 +278,7 @@ Technically HTTP doesn't forbid it, but RFC 9110 says a body in GET has **no def
 | 451 | Unavailable For Legal Reasons | | |
 
 ### 5xx — Server Errors
+
 | Code | Name | Meaning |
 |---|---|---|
 | **500** | Internal Server Error | Unhandled exception in server code (a bug!) |
@@ -304,6 +311,7 @@ Technically HTTP doesn't forbid it, but RFC 9110 says a body in GET has **no def
 Headers are **metadata**: "information about the information". Like the label on a parcel (sender, weight, fragile) versus the item inside (body).
 
 ### Request headers you must know
+
 | Header | Example | Purpose |
 |---|---|---|
 | `Host` | `api.shop.com` | Which website on the server (mandatory in HTTP/1.1). Postman adds automatically |
@@ -325,6 +333,7 @@ Headers are **metadata**: "information about the information". Like the label on
 | `Connection` | `keep-alive` | Reuse TCP connection |
 
 ### Response headers you must know
+
 | Header | Purpose |
 |---|---|
 | `Content-Type` | Format of the response body (`application/json; charset=utf-8`) |
@@ -373,6 +382,7 @@ Headers are **metadata**: "information about the information". Like the label on
 JSON (JavaScript Object Notation) is the language most APIs speak.
 
 ### Data types in JSON (exactly 6 kinds of values)
+
 | Type | Example |
 |---|---|
 | String | `"hello"` (always **double** quotes) |
@@ -450,6 +460,7 @@ REST = **RE**presentational **S**tate **T**ransfer, defined by Roy Fielding (200
 6. **Code on Demand** (optional) — server can send executable code (e.g. JavaScript).
 
 ### REST resource naming best practices
+
 | ✅ Good | ❌ Bad | Why |
 |---|---|---|
 | `GET /users` | `GET /getAllUsers` | Use nouns; method is the verb |
@@ -466,6 +477,7 @@ REST = **RE**presentational **S**tate **T**ransfer, defined by Roy Fielding (200
 - **Header**: `Accept: application/vnd.shop.v1+json` or `X-API-Version: 1`
 
 ### Pagination styles (you'll test these a lot)
+
 | Style | Example | Notes |
 |---|---|---|
 | Offset/limit | `?offset=40&limit=20` | Simple; slow on huge tables; duplicates when data shifts |
@@ -512,6 +524,7 @@ Common mechanisms (all covered in Chapter 6): API Key, Basic Auth, Bearer Token,
 - **Token-based auth**: Login → server returns a token (often JWT) → client sends `Authorization: Bearer <token>`.
 
 Cookie attributes:
+
 | Attribute | Meaning |
 |---|---|
 | `Domain` | Which domains get the cookie |

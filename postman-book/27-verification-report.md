@@ -5,6 +5,7 @@
 ---
 
 ## 27.1 Environment
+
 | Item | Version |
 |---|---|
 | Node.js | 22.22 |
@@ -19,6 +20,7 @@ Public practice APIs (JSONPlaceholder, httpbin, Restful-Booker) were **not reach
 ---
 
 ## 27.2 What was executed
+
 | Area | Result |
 |---|---|
 | **Newman suite** (`verification/build.js`): 57 requests, 100 test scripts, 71 pre-request scripts | **180 / 180 assertions passed**. 1 intentional request error (G9, unresolved `{{baseUrl}}` in `pm.sendRequest`) |

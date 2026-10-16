@@ -139,6 +139,7 @@ Run nightly in CI against staging; failures = security bugs → triage with secu
 ---
 
 ## 15.4 Postman's own security hygiene
+
 | Risk | Mitigation |
 |---|---|
 | Secrets in shared values / exported files | Vault, local values, CI secrets; secret scanner |
@@ -155,6 +156,7 @@ That last one is important: **a collection's scripts can read your environment (
 ---
 
 ## 15.5 Postman vs dedicated security tools
+
 | Tool | Strength |
 |---|---|
 | Postman | Business-logic auth/authorization tests, regression in CI, readable for whole team |

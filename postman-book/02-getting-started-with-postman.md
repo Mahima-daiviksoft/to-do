@@ -9,6 +9,7 @@
 Postman is an **API platform** used to **design, build, test, document, mock, monitor, and collaborate on APIs**. It started (2012) as a simple Chrome extension built by Abhinav Asthana to make API testing easier, became a desktop app, and grew into a full platform used by tens of millions of developers and the majority of Fortune 500 companies.
 
 ### What Postman can do (the big map)
+
 | Capability | Feature in Postman |
 |---|---|
 | Send any API request | HTTP, GraphQL, gRPC, WebSocket, Socket.IO, MQTT, SOAP, AI/MCP requests |
@@ -150,6 +151,7 @@ Items you can pin/hide via "Configure sidebar":
 - **Eye icon / variables quick look** — view and edit current variable values (in newer versions there's a variables pane on the right).
 
 ### Request builder tabs
+
 | Tab | Purpose |
 |---|---|
 | **Params** | Query params and path variables in a table (auto-syncs with URL) |
@@ -201,6 +203,7 @@ Right side panel (newer UI): **Documentation**, **Comments**, **Code snippet** (
 Collections, environments, API specs, mock servers, monitors, flows, and (in v12) a linked Git repository for Native Git workspaces.
 
 ### Workspace roles (common)
+
 | Role | Can do |
 |---|---|
 | **Admin** | Manage workspace settings, members, roles; delete workspace |
@@ -216,6 +219,7 @@ Element-level roles exist too (e.g. a collection **Editor** vs **Viewer**). Team
 ## 2.8 Settings you should configure on day 1
 
 Settings → **General**:
+
 | Setting | Recommendation | Why |
 |---|---|---|
 | **SSL certificate verification** | ON (turn OFF only for local self-signed dev servers, or better, add the CA cert) | Security |

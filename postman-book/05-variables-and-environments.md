@@ -95,6 +95,7 @@ Now in the pre-request script: `pm.variables.set("baseUrl", "http://localhost:80
 This changed in recent Postman versions, so learn both models.
 
 ### Older model (v10 and earlier v11; still in the VS Code extension and many companies)
+
 | Column | Synced to Postman cloud & shared with team? | Used when sending? |
 |---|---|---|
 | **Initial value** | ✅ Yes | Only if current value is empty (it gets copied into current) |
@@ -131,6 +132,7 @@ This changed in recent Postman versions, so learn both models.
 
 ### Create
 Sidebar → Environments → `+` → name: `Orders - DEV`.
+
 | Variable | Type | Shared value | Local value |
 |---|---|---|---|
 | baseUrl | default | `https://dev-api.shop.com` | `https://dev-api.shop.com` |
@@ -231,6 +233,7 @@ await pm.vault.unset("old-key");
 - Vault key: you can store/rotate it; if you lose it you may need to reset the vault (secrets lost).
 
 ### Secrets strategy for a company (best practice)
+
 | Where you run | Where secrets come from |
 |---|---|
 | Your laptop (manual testing) | Postman Vault (linked to company secret manager if available) or local values |
@@ -249,6 +252,7 @@ Postman provides **dynamic variables** (powered by the faker.js library). They g
 > 🧒 Like a **magic dice**: every roll gives a new number.
 
 ### Common
+
 | Variable | Example output |
 |---|---|
 | `{{$guid}}` | `611c2e81-2ccb-42d8-9ddc-2d0bfa65c1b4` |

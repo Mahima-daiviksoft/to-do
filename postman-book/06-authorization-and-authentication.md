@@ -140,6 +140,7 @@ Common bugs: **clock skew** (timestamp too far from server time → 401), wrong 
 > 🧒 You want to let a **photo-printing app** use your **Google Photos**, but you don't want to give it your Google password. So Google gives the app a **special ticket** (access token) that only allows "read photos", only for a while. That's OAuth 2.0.
 
 ### Roles
+
 | Role | Example |
 |---|---|
 | **Resource Owner** | You, the user |
@@ -201,6 +202,7 @@ sequenceDiagram
 - **Token** dropdown (select from stored tokens), **Header Prefix** (`Bearer`), **Add authorization data to**: Request Headers / Request URL, **Auto-refresh token** (uses refresh token when access token expires), **Share token** (share token with workspace collaborators — careful!).
 
 **Configure New Token** section:
+
 | Field | Meaning |
 |---|---|
 | Token Name | Label for this token in Postman's token manager |
@@ -231,6 +233,7 @@ Then **Get New Access Token** → login window/browser → token appears → **U
 - Scope: `api://{{apiAppId}}/.default`
 
 ### Common OAuth errors & fixes
+
 | Error | Meaning | Fix |
 |---|---|---|
 | `invalid_client` | Wrong client id/secret, or wrong client-auth method (header vs body) | Toggle "Client Authentication"; re-copy secret (trailing space!) |

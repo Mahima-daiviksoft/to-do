@@ -125,6 +125,7 @@ postman workspace push        # v12 Native Git
 ---
 
 ## 19.4 Status codes cheat sheet
+
 | 2xx | 3xx | 4xx | 5xx |
 |---|---|---|---|
 | 200 OK | 301 Moved Permanently | 400 Bad Request | 500 Internal Server Error |

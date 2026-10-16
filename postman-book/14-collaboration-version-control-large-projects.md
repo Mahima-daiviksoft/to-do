@@ -5,6 +5,7 @@
 ---
 
 ## 14.1 Collaboration features
+
 | Feature | Use |
 |---|---|
 | **Team workspaces** | Shared home for a product/domain |
@@ -88,6 +89,7 @@ Rules:
 ---
 
 ## 14.4 Naming conventions
+
 | Element | Convention | Example |
 |---|---|---|
 | Workspace | `<Domain> – <Service> API` | `Commerce – Orders API` |

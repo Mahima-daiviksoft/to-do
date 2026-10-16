@@ -11,6 +11,7 @@
 - **Scheduling & scripting**: cron jobs, Docker, Kubernetes jobs.
 
 Two tools:
+
 | | **Newman** | **Postman CLI** |
 |---|---|---|
 | Made by | Postman (open source, MIT) | Postman (official, closed source binary) |
@@ -57,6 +58,7 @@ newman run Orders.postman_collection.json \
 ```
 
 ### Newman options (most important)
+
 | Option | Meaning |
 |---|---|
 | `run <collection>` | File path **or URL** (e.g. Postman API link) |

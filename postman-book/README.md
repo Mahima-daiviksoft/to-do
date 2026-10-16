@@ -69,6 +69,7 @@ Legend: 🟢 Entry · 🟡 Intermediate · 🔴 Experienced
 ---
 
 ## 🗓️ Suggested 3-week study plan (add week 4 for Ch 21–26 if you work on large/enterprise projects)
+
 | Week | Days 1–2 | Days 3–4 | Days 5–6 | Day 7 |
 |---|---|---|---|---|
 | 1 | Ch 1–2 | Ch 3–4 | Ch 5 + Labs 1–5 | 18A revision |
