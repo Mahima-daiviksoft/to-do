@@ -67,6 +67,11 @@ module.exports = (api) => {
 need a **project-wide** `babel.config.js` (verified: with `babel.config.js` and an adjusted
 `transformIgnorePatterns`, ESM packages in node_modules are transformed and work).
 
+📌 **Babel 8** (released June 2026, now `@babel/core`'s `latest` tag): `babel-jest` 30 supports
+it (verified), `babel-jest` 29 expects Babel 7, and some older transformers that call
+`babel.transform()` synchronously break on Babel 8 (verified with `@vue/vue3-jest`). React Native
+projects should stay on Babel 7. See Chapter 40 §40.4.
+
 ## 15.3 TypeScript options compared
 
 | | Babel (`@babel/preset-typescript`) | `ts-jest` | `@swc/jest` | Node type stripping (Jest 30.5+) |
@@ -218,9 +223,11 @@ module.exports = {
 Read the regex: "ignore paths containing `/node_modules/` **unless** followed by one of these package
 names". Requirements:
 - A **project-wide** `babel.config.js` (not `.babelrc`) so Babel applies to node_modules.
-- For **pnpm**, packages live under `node_modules/.pnpm/<name>@<version>/node_modules/<name>`;
-  use a pattern like `'node_modules/(?!(\\.pnpm|uuid|nanoid))'` or
-  `'/node_modules/(?!(.pnpm/)?(uuid|nanoid))'` — test with care.
+- For **pnpm**, packages live under `node_modules/.pnpm/<name>@<version>/node_modules/<name>`, so
+  the npm-style pattern above **does not work** (verified). Use
+  `'/node_modules/(?!(\\.pnpm/)?(uuid|nanoid))'` (verified with pnpm 10 + `nanoid@5`). Avoid
+  `'node_modules/(?!(\\.pnpm|…))'`: it passes but transforms every pnpm package (slow). Details:
+  Chapter 40 §40.2.
 - Scoped packages: `(?!(@scope/pkg|other)/)` works; for all of a scope: `@scope/`.
 
 Verified in our lab: `--transformIgnorePatterns '/node_modules/(?!(esm-only|esm-notype)/)'` made

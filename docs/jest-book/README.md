@@ -84,6 +84,24 @@ Symbols used:
 29. [Scenario, debugging & live-coding questions](part-6-interview/29-interview-scenarios-coding.md)
 30. [Cheat sheet & glossary](part-6-interview/30-cheat-sheet-glossary.md)
 
+### Part 7 — Frameworks, ecosystem & special topics
+31. [Vue and Svelte](part-7-ecosystem/31-vue-and-svelte.md)
+32. [Angular](part-7-ecosystem/32-angular.md)
+33. [Next.js: App Router, Server Components, Server Actions, Route Handlers](part-7-ecosystem/33-nextjs.md)
+34. [Data & state libraries: Redux Toolkit, RTK Query, TanStack Query, Apollo, Zustand](part-7-ecosystem/34-data-and-state-libraries.md)
+35. [Storybook stories as tests, accessibility, i18n](part-7-ecosystem/35-storybook-a11y-i18n.md)
+36. [Browser APIs in jsdom: IndexedDB, canvas, files, drag & drop, clipboard, workers, WebSockets](part-7-ecosystem/36-browser-apis-in-jsdom.md)
+37. [Electron, browser extensions, CLIs](part-7-ecosystem/37-electron-extensions-cli.md)
+38. [Property-based, mutation and contract testing](part-7-ecosystem/38-property-mutation-contract.md)
+39. [E2E and real browsers (Playwright, Puppeteer, Detox)](part-7-ecosystem/39-e2e-and-real-browsers.md)
+40. [Package managers & platforms: pnpm, Yarn PnP, Babel 8, Windows, Docker, proxies](part-7-ecosystem/40-package-managers-platforms.md)
+41. [Jest visually: diagrams](part-7-ecosystem/41-visual-guide.md)
+42. [Interview questions for Part 7 topics](part-7-ecosystem/42-interview-ecosystem.md)
+
+### Hands-on
+- [**Runnable examples**](examples/README.md): 62 passing core/React/Node tests plus Vue, Angular, Next.js
+  and Svelte projects. Every one passes. Run them, then break them to learn the failure messages.
+
 ---
 
 ## A note about this repository
