@@ -385,7 +385,7 @@ test('shows error on 500', async () => {
 });
 ```
 
-Note: MSW 2 in the **jsdom** environment needs the Fetch API globals (`fetch`, `Request`, `Response`,
+Note: MSW 2 and 3 (same `http`/`HttpResponse`/`setupServer` API; MSW 3 needs Node ≥ 22.12) in the **jsdom** environment need the Fetch API globals (`fetch`, `Request`, `Response`,
 `TextEncoder`, streams…) which jsdom lacks. The MSW docs recommend a custom environment
 (e.g. `jest-fixed-jsdom`) or polyfills via `setupFiles`. (Relative URLs like `/api/users` also need a
 base URL; jsdom's default is `http://localhost/`.)
