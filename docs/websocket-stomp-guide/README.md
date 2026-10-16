@@ -8,6 +8,8 @@
 
 ---
 
+> **Whole book as one PDF:** [websocket-stomp-book.pdf](websocket-stomp-book.pdf) (185 A4 pages, with bookmarks).
+
 ## How this book is organised
 
 | # | Chapter | What you will be able to do after reading it |
