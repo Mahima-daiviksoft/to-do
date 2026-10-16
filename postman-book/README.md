@@ -1,6 +1,6 @@
 # 📘 The Complete Postman Book — From Zero to Expert (with Interview Preparation)
 
-A full, book-length guide to Postman, written for **total beginners** ("explain like I'm 5" analogies) that goes all the way to **senior or lead level** (CI/CD, governance, security, large-team practices). Interview preparation is built in.
+A full, book-length guide to Postman, written for **total beginners** ("explain like I'm 5" analogies) that goes all the way to **senior or lead level** (CI/CD, governance, security, large-team practices). Interview preparation is built in, and the code has been executed and checked (see Chapter 27).
 
 > **Version note (October 2026):** Covers Postman v10 → v11 → **v12**: Native Git with YAML Collection v3, Agent Mode, API Catalog. It also covers the March 2026 plan change to Free (single user), Solo, Team and Enterprise. Where Postman renamed something, the book gives both names. For example, "Tests" became "Post-response", and "Initial/Current value" became "Shared/Local value". That way you can work with any version your company uses.
 
@@ -30,8 +30,17 @@ A full, book-length guide to Postman, written for **total beginners** ("explain 
 | 18A | [Interview Q&A — Fundamentals (Q1–Q95)](18a-interview-questions-fundamentals.md) | 🟢🟡 |
 | 18B | [Interview Q&A — Scripting, Testing, Automation, Advanced (Q96–Q190)](18b-interview-questions-scripting-automation-advanced.md) | 🟡🔴 |
 | 18C | [Interview — Scenarios, Live Coding, Architecture, Rapid-fire](18c-interview-scenarios-coding-architecture.md) | 🔴 |
+| 18D | [Interview — Researched Patterns, Company-Tagged Questions & Verified Gotchas](18d-interview-research-and-gotchas.md) | 🟡🔴 |
 | 19 | [Cheat Sheets, Snippet Library & Glossary](19-cheat-sheets-and-glossary.md) | All |
 | 20 | [Hands-On Labs & Capstone Project](20-hands-on-labs-and-capstone.md) | All |
+| 21 | [Native Git & the v12 Workflow (deep dive)](21-native-git-and-v12-workflow.md) | 🔴 |
+| 22 | [Postman Flows & FQL (deep dive)](22-postman-flows-and-fql.md) | 🟡🔴 |
+| 23 | [Enterprise Admin, Governance (Spectral), Integrations & VS Code](23-enterprise-admin-governance-integrations-vscode.md) | 🔴 |
+| 24 | [Contract Testing with Pact](24-contract-testing-with-pact.md) | 🔴 |
+| 25 | [Extending Newman: Custom Reporters](25-extending-newman-custom-reporters.md) | 🔴 |
+| 26 | [Migration Guides, Certifications & Career](26-migration-certifications-career.md) | All |
+| 27 | [Verification Report — what was tested & corrected](27-verification-report.md) | All |
+| — | [`verification/` — runnable test setup for the book's code](verification/) | — |
 
 Legend: 🟢 Entry · 🟡 Intermediate · 🔴 Experienced
 
@@ -59,7 +68,7 @@ Legend: 🟢 Entry · 🟡 Intermediate · 🔴 Experienced
 
 ---
 
-## 🗓️ Suggested 3-week study plan
+## 🗓️ Suggested 3-week study plan (add week 4 for Ch 21–26 if you work on large/enterprise projects)
 | Week | Days 1–2 | Days 3–4 | Days 5–6 | Day 7 |
 |---|---|---|---|---|
 | 1 | Ch 1–2 | Ch 3–4 | Ch 5 + Labs 1–5 | 18A revision |
@@ -69,5 +78,6 @@ Legend: 🟢 Entry · 🟡 Intermediate · 🔴 Experienced
 ---
 
 ## ✅ Accuracy policy
+- **The code was executed, not just written.** The book's scripts were run in Newman 6.2.3 against a local stand-in API: 180/180 assertions pass. The Pact, custom-reporter, Spectral and FQL examples were also run, and all 12 diagrams were rendered. Running them led to 11 corrections, listed in [Chapter 27](27-verification-report.md). You can re-run everything from [`verification/`](verification/).
 - Facts come from Postman's official documentation and widely used, established behaviour. Recent changes (v11/v12, the 2026 plans, Vault limits, Native Git) were checked against current Postman docs and coverage.
 - Postman releases updates often. Plan limits, prices, UI labels and new features can change. Where something is version- or plan-dependent, the text says so. Check the Postman Learning Center or release notes for your exact version before committing to numbers in a company proposal.

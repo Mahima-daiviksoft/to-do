@@ -1,0 +1,23 @@
+{
+  "name": "postman-book-verification",
+  "private": true,
+  "description": "Re-runs the code examples from the Postman book against a local stand-in API",
+  "scripts": {
+    "server": "node server.js",
+    "build": "node build.js",
+    "test": "node build.js && newman run verify.postman_collection.json -e verify.postman_environment.json -d data.csv -n 1 --env-var clientSecret=s3cret -r cli,junit,slacksummary --reporter-junit-export out/junit.xml --reporter-slacksummary-export out/summary.md",
+    "fql": "node fql.js",
+    "pact": "node pact/consumer.pact.test.js && node pact/provider.verify.js",
+    "lint-spec": "spectral lint gov/openapi.yaml --ruleset gov/ruleset.yaml"
+  },
+  "devDependencies": {
+    "@pact-foundation/pact": "17.1.4",
+    "@stoplight/spectral-cli": "^6.17.0",
+    "axios": "^1.7.0",
+    "express": "^4.21.0",
+    "jsonata": "^2.0.0",
+    "newman": "6.2.3",
+    "newman-reporter-htmlextra": "^1.23.1",
+    "newman-reporter-slacksummary": "file:./newman-reporter-slacksummary"
+  }
+}

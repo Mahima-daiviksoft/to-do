@@ -1,0 +1,7 @@
+node_modules/
+out/
+pacts/
+pact/pacts/
+verify.postman_collection.json
+verify.postman_environment.json
+data.csv

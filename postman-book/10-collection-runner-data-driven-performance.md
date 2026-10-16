@@ -52,7 +52,7 @@ sql injection,' OR 1=1 --,x,400,
 ```
 - **First row = header** (variable names).
 - One iteration per row. Iterations auto-set to row count.
-- Values are **strings**. `"200"` not `200`.
+- **Types are not reliable.** In Newman 6 (verified while writing this book), number-looking values are auto-converted to numbers and lose leading zeros (`007` → `7`, `1e3` → `1000`); `true`/`false` remain the *strings* `"true"`/`"false"`. Always normalise: `Number(pm.iterationData.get("expectedStatus"))`, `pm.iterationData.get("active") === "true"`, `String(pm.iterationData.get("zip")).padStart(6, "0")`. If exact types matter, use a **JSON** data file.
 - Commas in values → wrap in double quotes: `"Smith, John"`. Quotes inside quotes → double them: `"He said ""hi"""`.
 - Save as **UTF-8** (Excel may add a **BOM** — the first header becomes `﻿testCase`, so `{{testCase}}` doesn't resolve! Save as "CSV UTF-8" carefully or strip BOM).
 - Avoid trailing empty lines (some versions create an empty iteration).
@@ -172,7 +172,7 @@ Metrics shown:
 
 ## 10.10 Chapter 10 Quick Revision
 - Runner: iterations, delay, data file, environment, save responses, keep variable values, cookies options.
-- CSV: header row, strings only, beware BOM/quotes/delimiters; JSON: array of objects, types preserved.
+- CSV: header row, unreliable types (number-like values become numbers, leading zeros lost; booleans stay strings), beware BOM/quotes/delimiters; JSON: array of objects, types preserved.
 - Data variables override environment ones (precedence!).
 - Extra iterations reuse last row.
 - Performance tab: VUs, duration, load profiles (fixed, ramp up, spike, peak), p90/p95/p99, throughput, error rate.

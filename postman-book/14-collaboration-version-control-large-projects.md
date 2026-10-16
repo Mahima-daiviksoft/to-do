@@ -24,6 +24,18 @@
 ## 14.2 Version control options
 
 ### Option A — Inside Postman (forks/PRs/version history)
+
+```mermaid
+flowchart LR
+  P[Parent collection<br/>team workspace] -- Fork --> F[Your fork]
+  F -- edit & test --> F
+  P -- Pull changes --> F
+  F -- Create pull request --> R{Review: diff, comments}
+  R -- changes requested --> F
+  R -- approved --> MG[Merge into parent]
+  MG --> P
+```
+
 - Fork → change → PR → review → merge.
 - Collection **version history/changelog**: restore.
 - **Tags/releases** on APIs (API Builder versions).

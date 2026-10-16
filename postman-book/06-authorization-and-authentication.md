@@ -154,6 +154,38 @@ Common bugs: **clock skew** (timestamp too far from server time → 401), wrong 
 - **Scopes** — permissions requested: `orders:read orders:write`.
 
 ### Grant types (flows) in Postman
+
+**Authorization Code with PKCE**, the flow Postman runs when you click *Get New Access Token*:
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as You (browser)
+  participant P as Postman (client)
+  participant A as Authorization server (Okta / Entra / Keycloak)
+  participant R as Resource server (your API)
+  P->>P: Generate code_verifier and code_challenge = SHA256(verifier)
+  P->>U: Open Auth URL ?response_type=code&client_id&redirect_uri&scope&state&code_challenge
+  U->>A: Log in + consent (MFA if required)
+  A-->>U: Redirect to callback (https://oauth.pstmn.io/v1/callback) ?code=...&state=...
+  U-->>P: Authorization code
+  P->>A: POST Access Token URL: grant_type=authorization_code, code, code_verifier (+ client auth)
+  A-->>P: access_token (+ refresh_token, id_token)
+  P->>R: GET /orders with Authorization: Bearer access_token
+  R-->>P: 200 OK
+```
+**Client Credentials** (machine-to-machine, the one that works in CI):
+```mermaid
+sequenceDiagram
+  participant S as Script / Newman / Service
+  participant A as Authorization server
+  participant R as API
+  S->>A: POST /token (x-www-form-urlencoded)<br/>grant_type=client_credentials, client_id, client_secret, scope
+  A-->>S: access_token, expires_in
+  S->>R: Request with Authorization: Bearer access_token
+  R-->>S: Response
+  Note over S: Cache the token until expires_in - margin (Chapter 6.13)
+```
+
 | Grant type | Who uses it | Steps | Notes |
 |---|---|---|---|
 | **Authorization Code** | Web apps with a backend | Browser login → `code` → exchange code + client secret for token | Most common for user login |
@@ -299,12 +331,12 @@ Why this works: Postman **waits for `pm.sendRequest` callbacks to finish** befor
 
 > Note: `return` at the top level of a Postman script works because scripts run inside a function wrapper. If your linter complains, wrap logic in an `if/else` instead.
 
-Async/await version (supported in recent Postman versions, where `pm.sendRequest` returns a promise when no callback is passed):
+Async/await version — works in recent Postman **app** versions only (top-level `await`, promise-returning `pm.sendRequest`):
 ```javascript
 const res = await pm.sendRequest({ url: pm.environment.get("tokenUrl"), method: "POST", /* ... */ });
 pm.environment.set("accessToken", res.json().access_token);
 ```
-If your company still uses older Newman/Postman versions, prefer the callback style — it works everywhere.
+**Newman 6.x does not support this** (verified: top-level `await` is a SyntaxError there). The callback version above was run successfully in Newman 6.2.3 — including the "fetch once, then reuse the cached token" behaviour — so prefer it for collections that run in CI.
 
 ### Pattern C — Retry once on 401 (post-response)
 ```javascript

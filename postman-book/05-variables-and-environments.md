@@ -53,6 +53,22 @@ Authorization: Bearer {{accessToken}}
 ### Precedence (narrowest wins)
 When the **same name** exists in multiple scopes, Postman uses the **narrowest** one:
 
+```mermaid
+flowchart TB
+  Q["Request uses {{baseUrl}}"] --> L{Local variable set?<br/>pm.variables.set}
+  L -- yes --> UL[Use LOCAL]
+  L -- no --> D{Data file column?}
+  D -- yes --> UD[Use DATA]
+  D -- no --> E{Active environment has it?}
+  E -- yes --> UE[Use ENVIRONMENT]
+  E -- no --> C{Collection variable?}
+  C -- yes --> UC[Use COLLECTION]
+  C -- no --> G{Global?}
+  G -- yes --> UG[Use GLOBAL]
+  G -- no --> X["Unresolved: sent literally as {{baseUrl}}<br/>e.g. ENOTFOUND {{baseurl}}"]
+```
+
+
 ```
 Local  >  Data  >  Environment  >  Collection  >  Global
 (highest priority)                          (lowest priority)
@@ -147,7 +163,7 @@ if (/prod/i.test(env) && ["POST", "PUT", "PATCH", "DELETE"].includes(method)
     throw new Error(`Blocked ${method} on ${env}. Set allowProdWrites=true locally if you REALLY mean it.`);
 }
 ```
-(In the Postman app, an error thrown in a pre-request script shows "There was an error in evaluating the Pre-request Script" and the request is not sent. Command-line runners report it as a script error, and their behaviour can differ by version and flags. For a clean, explicit skip that works in every runner, use `pm.execution.skipRequest()` in the guard instead of `throw`, and log a warning with `console.warn`.)
+(In the Postman app, an error thrown in a pre-request script shows "There was an error in evaluating the Pre-request Script" and the request is not sent. **Newman is different (verified with Newman 6.2.3): it reports the error *and still sends the request*.** So a `throw`-based guard does not protect you in CI. For a clean, explicit skip that works in every runner, use `pm.execution.skipRequest()` in the guard instead of `throw`, and log a warning with `console.warn`.)
 
 ---
 
@@ -182,7 +198,7 @@ wrong@x.com,bad,401
 ```
 In request body: `{"email":"{{email}}","password":"{{password}}"}`.
 In test: `pm.response.to.have.status(Number(pm.iterationData.get("expectedStatus")));`
-Runner/Newman runs one **iteration per row**. CSV values are **strings** — convert numbers/booleans yourself. Full details in Chapter 10.
+Runner/Newman runs one **iteration per row**. Data file values need care with types: in Newman 6 (verified), CSV values that look like numbers are converted to numbers (`200` → `200`, `007` → `7`, `1e3` → `1000`), while `true`/`false` stay strings. Normalise with `Number(...)` / `String(...)`, and quote-protect codes with leading zeros (ZIP codes, phone numbers) or use a JSON data file. Full details in Chapter 10.
 
 ---
 

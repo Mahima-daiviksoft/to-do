@@ -97,7 +97,7 @@ CI uses this to pass/fail the job.
 newman run "https://api.getpostman.com/collections/$COLLECTION_UID?apikey=$POSTMAN_API_KEY" \
   -e "https://api.getpostman.com/environments/$ENV_UID?apikey=$POSTMAN_API_KEY"
 ```
-> ⚠️ The API key appears in the URL → may leak into logs. Mask it in CI, use a service account key with minimal access, rotate regularly. Alternatively download the files with `curl -H "X-API-Key: $KEY"` first, then run locally.
+> ⚠️ The API key appears in the URL → may leak into logs. Newman 6 also has `--postman-api-key <key>`: pass the plain API URLs (without `?apikey=`) and the key separately, e.g. `newman run "https://api.getpostman.com/collections/$UID" --postman-api-key "$POSTMAN_API_KEY"`. Mask it in CI, use a service account key with minimal access, rotate regularly. Alternatively download the files with `curl -H "X-API-Key: $KEY"` first, then run locally.
 
 ### htmlextra reporter (very popular)
 ```bash
@@ -108,7 +108,7 @@ newman run c.json -r htmlextra \
   --reporter-htmlextra-showOnlyFails \
   --reporter-htmlextra-skipSensitiveData
 ```
-Other options: `--reporter-htmlextra-darkTheme`, `--reporter-htmlextra-hideRequestBody "Login"`, `--reporter-htmlextra-hideResponseBody "Login"`, `--reporter-htmlextra-showEnvironmentData`, `--reporter-htmlextra-skipHeaders "Authorization"`, `--reporter-htmlextra-template custom.hbs`. Also `newman-reporter-allure` for Allure reports.
+Other options (from the reporter's README): `--reporter-htmlextra-hideRequestBody "Login"`, `--reporter-htmlextra-hideResponseBody "Login"`, `--reporter-htmlextra-showEnvironmentData`, `--reporter-htmlextra-skipHeaders "Authorization"`, `--reporter-htmlextra-template custom.hbs` (the package ships alternative templates, including a dark one), `--reporter-htmlextra-omitHeaders`, `--reporter-htmlextra-omitRequestBodies`, `--reporter-htmlextra-omitResponseBodies`, `--reporter-htmlextra-timezone "Asia/Kolkata"`, `--reporter-htmlextra-logs`, `--reporter-htmlextra-testPaging`. Also `newman-reporter-allure` for Allure reports.
 
 > 🔐 HTML/JSON reports include requests/responses → can contain **tokens and PII**. Use skip/hide options and restrict report artifact access.
 
@@ -330,6 +330,17 @@ steps:
 ```
 
 ### Where in the pipeline?
+
+```mermaid
+flowchart LR
+  PR[Pull request] --> B[Build + unit tests] --> SM[API smoke<br/>Newman / Postman CLI]
+  SM --> DQ[Deploy QA] --> RG[Full API regression<br/>+ data-driven + negative]
+  RG --> DS[Deploy staging] --> CT[Smoke + contract tests<br/>+ governance lint]
+  CT --> AP{Approval} --> DP[Deploy prod] --> RO[Read-only smoke]
+  DP --> MON[Monitors every N min<br/>alerts to on-call]
+  RG -. JUnit + HTML reports .-> REP[(CI artifacts)]
+```
+
 ```
 commit → build → unit tests → deploy to QA → [SMOKE API tests] → [REGRESSION API tests]
        → deploy to STAGING → [SMOKE + contract tests] → approval → deploy PROD → [read-only SMOKE + monitors]

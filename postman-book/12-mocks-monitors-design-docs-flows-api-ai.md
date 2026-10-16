@@ -20,6 +20,24 @@
 4. Set `{{baseUrl}}` in a "MOCK" environment to this URL → the same collection now hits the mock.
 
 ### 12.3 How a Postman mock decides what to return (matching algorithm)
+
+```mermaid
+flowchart TD
+  IN[Incoming request to mock URL] --> K{Private mock?}
+  K -- "yes, no valid x-api-key" --> E401[401 error]
+  K -- ok --> H{"x-mock-response-name / -id / -code header?"}
+  H -- yes --> PICK[Return that example]
+  H -- no --> M[Filter examples by HTTP method]
+  M --> PATH[Score by path match<br/>variables act as wildcards]
+  PATH --> QP[Score by query params]
+  QP --> OPT{"x-mock-match-request-headers /<br/>-body sent?"}
+  OPT -- yes --> HB[Also score headers / body]
+  OPT -- no --> BEST
+  HB --> BEST{Any match?}
+  BEST -- yes --> RET[Return highest-scoring example]
+  BEST -- no --> E404[404 mockRequestNotFoundError]
+```
+
 The mock looks at **saved examples** in the collection. For an incoming request it:
 1. Filters examples by **HTTP method**.
 2. Matches the **URL path** (examples using variables like `{{orderId}}` or `:orderId` act as wildcards for that segment) and **query parameters** (closer matches score higher).

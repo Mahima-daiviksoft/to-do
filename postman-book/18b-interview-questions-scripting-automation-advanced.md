@@ -52,7 +52,7 @@ Sets a **local** variable — temporary, highest precedence, lasts for the reque
 `JSON.parse(pm.variables.replaceIn(pm.request.body.raw))` — because `pm.request.body.raw` holds unresolved placeholders, which may be invalid JSON (e.g. unquoted `{{age}}`).
 
 **Q111. 🟡 What is `pm.sendRequest`? Use cases?**
-Sends an HTTP request from within a script (callback or, in recent versions, promise/await). Uses: fetch auth tokens, create/cleanup test data, verify side effects, polling, call other services. It doesn't inherit collection auth/headers and doesn't auto-resolve `{{vars}}` in strings (use `replaceIn`).
+Sends an HTTP request from within a script (callback style everywhere; promise/await only in recent Postman app versions, not Newman 6). Uses: fetch auth tokens, create/cleanup test data, verify side effects, polling, call other services. It doesn't inherit collection auth/headers and doesn't auto-resolve `{{vars}}` in strings (use `replaceIn`).
 
 **Q112. 🟡 Write a `pm.sendRequest` POST example.**
 ```javascript
@@ -94,7 +94,7 @@ Renders custom HTML (Handlebars template + data) in the response's Visualize tab
 `console.log/info/warn/error` → Postman Console (stdout in Newman).
 
 **Q122. 🔴 How do you handle asynchronous code in Postman scripts?**
-Postman waits for pending callbacks, timers and promises (`pm.sendRequest` callbacks, `setTimeout`) before finishing the script. Tests inside callbacks register correctly. With async/await (recent versions), await promises to avoid unhandled rejections.
+Postman waits for pending callbacks, timers and promises (`pm.sendRequest` callbacks, `setTimeout`) before finishing the script. Tests inside callbacks register correctly. Top-level `await` works in recent Postman app versions but not in Newman 6 (verified), so for portable code wrap `pm.sendRequest` in a Promise inside an async IIFE and add `.catch()`.
 
 **Q123. 🔴 How do you add a delay inside a script?**
 `setTimeout(() => {}, 2000);` — the sandbox waits for the timer. For runs, also Runner Delay / `--delay-request`.
@@ -197,7 +197,7 @@ Tool to run all/selected requests of a collection or folder in sequence with ite
 Running the same requests with multiple data sets from CSV/JSON files; each row = one iteration; access via `{{column}}` or `pm.iterationData.get()`.
 
 **Q151. 🟡 CSV vs JSON data files?**
-CSV: simple, flat, strings only, header row required. JSON: array of objects, preserves types and nesting.
+CSV: simple, flat, header row required, no reliable types (Newman converts number-like values to numbers and drops leading zeros; `true`/`false` stay strings). JSON: array of objects, preserves types and nesting.
 
 **Q152. 🔴 What if iterations exceed rows in the data file?**
 The extra iterations reuse the last row's values. Fewer iterations → only first N rows.

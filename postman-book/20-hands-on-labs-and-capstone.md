@@ -207,3 +207,5 @@ Build a collection that a company could actually run in CI.
 ---
 
 🎉 **You've finished the book.** Go back to Chapter 18 regularly, do the labs twice, and build your own capstone on a real company API (with permission). That's how you become the Postman expert on your team.
+
+➡️ Going further: **Chapters 21–26** (Native Git, Flows/FQL, Enterprise & governance, Pact, custom reporters, migration & career) and **Chapter 27** (verification report).

@@ -16,6 +16,21 @@ UI: **Scripts** tab → **Pre-request** / **Post-response** (older UI: "Pre-requ
 
 ## 7.2 Execution order (memorise this!)
 
+```mermaid
+flowchart LR
+  subgraph PRE[Pre-request phase]
+    A[Collection pre-request] --> B[Folder pre-request<br/>outer → inner] --> C[Request pre-request]
+  end
+  C --> SEND((HTTP request sent<br/>response received))
+  subgraph POST[Post-response phase]
+    D[Collection post-response] --> E[Folder post-response<br/>outer → inner] --> F[Request post-response]
+  end
+  SEND --> D
+  F --> N{Collection run?}
+  N -- "setNextRequest / next item" --> A
+```
+
+
 For one request inside `Collection > Folder A > Folder B > Request`:
 
 ```
@@ -97,6 +112,8 @@ pm.request.auth;                    // auth definition
 // Headers
 pm.request.headers.add({ key: "X-Correlation-ID", value: pm.variables.replaceIn("{{$guid}}") });
 pm.request.headers.upsert({ key: "Accept-Language", value: "en-IN" }); // add or replace
+// Note: add() does NOT replace — if the header already exists you send it twice
+// (servers usually see "X-A: 1, 2"). Use upsert() when a collection script may already have set it.
 pm.request.headers.remove("X-Debug");
 
 // Query params
@@ -115,7 +132,12 @@ const body = JSON.parse(pm.request.body.raw || "{}");
 body.requestedAt = new Date().toISOString();
 pm.request.body.raw = JSON.stringify(body);
 
-// Or replace body using update()
+// ⚠️ If the request was saved WITHOUT a body (e.g. a GET), pm.request.body is undefined,
+// so pm.request.body.update(...) throws "Cannot read properties of undefined (reading 'update')".
+// Assigning a plain object works in that case (verified in Newman 6):
+// pm.request.body = { mode: "raw", raw: JSON.stringify({ a: 1 }), options: { raw: { language: "json" } } };
+
+// Or replace an existing body using update()
 pm.request.body.update({
     mode: "raw",
     raw: JSON.stringify({ hello: "world" }),
@@ -158,7 +180,7 @@ pm.response.headers;         // HeaderList
 pm.response.headers.get("Content-Type");   // case-insensitive
 pm.response.headers.has("ETag");
 pm.response.headers.toObject();
-pm.response.cookies;         // CookieList from this response
+pm.response.cookies;         // CookieList from this response (⚠️ found EMPTY in Newman 6 — use pm.cookies or parse Set-Cookie headers)
 pm.response.text();          // body as string
 pm.response.json();          // body parsed as JSON (throws if not JSON!)
 ```
@@ -246,12 +268,22 @@ pm.sendRequest({
 ```
 Body modes: `raw`, `urlencoded` (array of `{key,value}`), `formdata` (array of `{key,value,type}`; file uploads from sendRequest are limited), `file`, `graphql` (`{ query, variables }`).
 
-### Promise / async-await (recent versions)
+### Promise / async-await
+Recent Postman **app** versions support top-level `await` and `pm.sendRequest` returning a promise when no callback is passed:
 ```javascript
-try {
-    const res = await pm.sendRequest({ url: "https://postman-echo.com/get", method: "GET" });
-    console.log(res.code);
-} catch (err) { console.error(err); }
+const res = await pm.sendRequest({ url: "https://postman-echo.com/get", method: "GET" }); // Postman app (recent) only
+```
+⚠️ **Verified while writing this book: Newman 6.2.3 rejects top-level `await`** (`SyntaxError: await is only valid in async functions...`) and its `pm.sendRequest` does **not** return a promise. If your collection also runs in Newman, use this portable pattern:
+```javascript
+// Works in the Postman app AND in Newman 6 (verified): wrap the callback API in a Promise
+const sendRequestAsync = (req) => new Promise((resolve, reject) =>
+    pm.sendRequest(req, (err, res) => err ? reject(err) : resolve(res)));
+
+(async () => {
+    const r1 = await sendRequestAsync(pm.variables.replaceIn("{{baseUrl}}/users/3"));
+    const r2 = await sendRequestAsync(pm.variables.replaceIn("{{baseUrl}}/users/" + r1.json().id));
+    pm.test("chained calls work", () => pm.expect(r2.code).to.eql(200));
+})().catch(err => pm.test("async block failed", () => { throw err; }));
 ```
 
 ### Parallel requests
@@ -289,7 +321,7 @@ pm.execution.location.current;                       // the current item's name/
 - The target must be in the **same collection run** (if you run only a folder, it must be within that run's scope).
 - Prefer **request ID** (`pm.info.requestId` of the target, or copy from the request info pane) over **name** — names change and can be duplicated.
 - Legacy equivalent: `postman.setNextRequest("name")` — still works in many versions; prefer `pm.execution.setNextRequest`.
-- `skipRequest()` **must** be in **pre-request**; in post-response it throws `TypeError: pm.execution.skipRequest isn't a function`. When skipped, the request and its post-response scripts don't run.
+- `skipRequest()` **must** be in **pre-request**; in post-response it throws `TypeError: pm.execution.skipRequest is not a function` (exact message verified in Newman 6). When skipped, the request and its post-response scripts don't run.
 
 Full workflow patterns in Chapter 9.
 
@@ -409,9 +441,10 @@ Examples:
 const moment = require("moment");
 pm.variables.set("checkin", moment().add(7, "days").format("YYYY-MM-DD"));
 
-const _ = require("lodash");
+// `_` is already a global — `const _ = require("lodash")` throws "Identifier '_' has already been declared"
+const lodash = require("lodash");   // or just use the global _
 const json = pm.response.json();
-const city = _.get(json, "data.user.address.city", "N/A");
+const city = lodash.get(json, "data.user.address.city", "N/A");
 
 const parse = require("csv-parse/lib/sync");
 const rows = parse(pm.response.text(), { columns: true, skip_empty_lines: true });

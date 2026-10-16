@@ -1,0 +1,13 @@
+openapi: 3.0.3
+info: { title: Orders API, version: 1.0.0 }
+paths:
+  /orders/{orderId}:
+    get:
+      summary: Get an order
+      responses: { '200': { description: OK } }
+  /orderItems:
+    post:
+      responses: { '201': { description: Created } }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }

@@ -283,11 +283,17 @@ pm.test("Security headers present", () => {
     pm.expect(h.has("X-Powered-By")).to.be.false;
 });
 pm.test("Session cookie is HttpOnly & Secure", () => {
-    const c = pm.response.cookies.one("sessionId");
-    pm.expect(c).to.exist;
-    pm.expect(c.httpOnly).to.be.true;
-    pm.expect(c.secure).to.be.true;
+    // Parse the raw Set-Cookie headers: works in the app AND Newman
+    // (pm.response.cookies was empty in Newman 6.2.3 during verification)
+    const setCookies = pm.response.headers.all()
+        .filter(h => h.key.toLowerCase() === "set-cookie")
+        .map(h => h.value);
+    const session = setCookies.find(v => v.startsWith("sessionId="));
+    pm.expect(session, "sessionId cookie").to.exist;
+    pm.expect(session).to.match(/;\s*HttpOnly/i);
+    pm.expect(session).to.match(/;\s*Secure/i);
 });
+pm.test("Cookie stored in jar", () => pm.expect(pm.cookies.has("sessionId")).to.be.true);
 pm.test("Cache disabled for user data", () => {
     pm.expect(pm.response.headers.get("Cache-Control")).to.match(/no-store|private/);
 });
@@ -366,7 +372,7 @@ pm.test("GET returns what POST created", () => {
 
 ```javascript
 // Compare this response to a saved "golden" snapshot, ignoring volatile fields
-const _ = require("lodash");
+// use the global `_` (lodash); re-declaring `const _` would throw a SyntaxError
 const omitVolatile = obj => _.omit(obj, ["createdAt", "updatedAt", "requestId"]);
 const current = omitVolatile(pm.response.json());
 
@@ -410,7 +416,7 @@ pm.sendRequest(pm.variables.replaceIn("{{baseUrl}}/orders/{{orderId}}"), (err, r
     pm.test("Order persisted", () => pm.expect(res.code).to.eql(200));
 });
 ```
-With `async/await` (recent versions), make sure promises are awaited — an un-awaited promise rejection can silently skip a test.
+With `async/await`: top-level `await` works only in recent Postman app versions, **not in Newman 6** (verified). For portability wrap `pm.sendRequest` in a Promise inside an async IIFE (Chapter 7.8) and always `.catch()` — an unhandled rejection can silently skip a test.
 
 ---
 
@@ -452,7 +458,7 @@ const feature = pm.environment.get("featureNewPricing") === "true";
 |---|---|---|
 | `JSONError: Unexpected token '<'` | Response is HTML (login page, 502 page), not JSON | Check status first; inspect body in Console; fix auth/URL |
 | `AssertionError: expected { Object } to equal { Object }` | Used `equal` instead of `eql` | Use `eql` / `deep.equal` |
-| `expected '5' to equal 5` | String vs number (variables/CSV are strings) | `Number(...)` or `parseInt` |
+| `expected '5' to equal 5` | String vs number (variables used in `{{ }}` become strings; CSV data types vary) | `Number(...)` or `parseInt` |
 | Test passes but should fail | Assertion outside `pm.test`, or `pm.expect` without assertion method (`pm.expect(x).to.be` with nothing) | Ensure a terminal assertion; place inside `pm.test` |
 | Test never runs | Code path skipped, script error earlier in the script | Check Console for script errors |
 | `Cannot read properties of undefined (reading 'x')` | Path wrong / field missing | Use optional chaining `json.data?.x`; log body |

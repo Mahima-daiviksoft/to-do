@@ -87,6 +87,28 @@ An API is a **contract** between a provider and a consumer. It defines:
 
 This is a **favourite interview question**: *"What happens when you type a URL and press Enter / Send?"*
 
+```mermaid
+sequenceDiagram
+  autonumber
+  participant P as Postman (client)
+  participant D as DNS resolver
+  participant G as Load balancer / API gateway
+  participant S as API service
+  participant DB as Database
+  P->>D: Resolve api.shop.com
+  D-->>P: 203.0.113.10
+  P->>G: TCP handshake (SYN, SYN-ACK, ACK)
+  P->>G: TLS handshake (certificate check, keys)
+  P->>G: HTTP request (method, path, headers, body)
+  G->>S: Forward (auth check, rate limit, routing)
+  S->>DB: Query
+  DB-->>S: Rows
+  S-->>G: HTTP response
+  G-->>P: Status, headers, body
+  Note over P: Postman shows timing per phase:<br/>DNS · TCP · SSL · TTFB · Download
+```
+
+
 1. **URL parsing** — the client splits `https://api.shop.com:443/v1/orders?status=paid` into scheme, host, port, path, query.
 2. **DNS lookup** — `api.shop.com` is converted to an IP address (e.g. `203.0.113.10`). Checks: local cache → OS cache → router → ISP resolver → root → TLD (`.com`) → authoritative name server.
 3. **TCP connection** — 3-way handshake: `SYN` → `SYN-ACK` → `ACK`.

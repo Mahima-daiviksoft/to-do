@@ -102,6 +102,18 @@ if (body.hasMore /* or body.page < body.totalPages */) {
 Cursor-based: store `body.next_cursor`, stop when it's null.
 
 ### Pattern 4: Polling an async job (202 Accepted → status endpoint)
+
+```mermaid
+flowchart TD
+  S[POST /reports → 202 + jobId] --> G[GET /jobs/:jobId]
+  G --> C{status?}
+  C -- COMPLETED --> P[Assert result ✓<br/>reset counter]
+  C -- FAILED --> F[Fail test ✗]
+  C -- RUNNING --> M{attempt < MAX?}
+  M -- yes --> W[setTimeout delay] --> R["setNextRequest(pm.info.requestId)"] --> G
+  M -- no --> T[Fail: timed out ✗]
+```
+
 ```javascript
 // "Get report status" post-response
 const MAX = 20;
@@ -138,7 +150,7 @@ if (retriable.includes(pm.response.code) && tries < 3) {
     pm.test("Final status is 2xx", () => pm.response.to.be.success);
 }
 ```
-> Note: Postman records every attempt's tests in results. Keep assertions in the final branch so retries don't produce false failures.
+> Note: Postman records every attempt's tests in results. Keep assertions in the final branch so retries don't produce false failures. **Also watch collection-level tests** (e.g. a generic "no 5xx" check): they run on every attempt, so a retried 503 still shows up as a failure (seen in verification). Skip the generic check while retrying, e.g. `if (!pm.variables.get("_tries")) pm.test(...)`, or make it aware of retriable codes.
 
 ### Pattern 6: Stop the run when a critical step fails
 ```javascript

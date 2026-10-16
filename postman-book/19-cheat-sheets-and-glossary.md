@@ -38,7 +38,7 @@ pm.expect(x).to.equal | eql | deep.equal | include | have.property | nested.prop
 
 // ── CONTROL ───────────────────────────────────────────
 pm.execution.setNextRequest(nameOrId | null) | skipRequest() | location
-pm.sendRequest(urlOrReq, (err, res) => {}) | await pm.sendRequest(req)
+pm.sendRequest(urlOrReq, (err, res) => {}) | await pm.sendRequest(req) /* app only; not Newman 6 */
 
 // ── COOKIES ───────────────────────────────────────────
 pm.cookies.get(n) | has(n) | toObject() ; pm.cookies.jar().get/getAll/set/unset/clear(url, ..., cb)
@@ -226,7 +226,7 @@ Collection pre → Folder pre → Request pre → [ SEND ] → Collection post �
 4. `eql` for deep equality.
 5. `setNextRequest` only in runs; `null` stops; last call wins; prefer IDs.
 6. `skipRequest` only in pre-request.
-7. CSV values are strings; extra iterations reuse last row.
+7. CSV types unreliable (number-like → number, `007` → 7, booleans stay strings) — normalise; extra iterations reuse last row.
 8. Newman exit 1 on failures; `--env-var` for secrets; `--export-environment` to persist.
 9. Postman CLI: login with API key, IDs or files, `api lint`, results to Postman.
 10. Mocks: examples, `x-mock-response-code/name/id`, `x-api-key` private.

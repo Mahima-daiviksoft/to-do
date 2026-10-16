@@ -1,0 +1,26 @@
+rules:
+  operation-must-have-summary:
+    description: Every operation must have a summary.
+    message: "{{path}} is missing a summary"
+    severity: warn
+    given: "$.paths[*][get,post,put,patch,delete]"
+    then:
+      field: summary
+      function: truthy
+  paths-kebab-case:
+    description: Path segments must be kebab-case.
+    severity: error
+    given: "$.paths[*]~"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(/[a-z0-9-]+|/\\{[a-zA-Z0-9]+\\})+$"
+  bearer-security-scheme-defined:
+    description: A bearer auth security scheme must exist.
+    severity: error
+    given: "$.components.securitySchemes[*]"
+    then:
+      field: type
+      function: enumeration
+      functionOptions:
+        values: [http, oauth2, openIdConnect, apiKey]
