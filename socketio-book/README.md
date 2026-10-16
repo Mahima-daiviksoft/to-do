@@ -9,9 +9,22 @@
 Differences with older versions (v2, v3) are called out where they matter, because
 interviewers love asking about them and old code bases still use them.
 
-Every protocol example in this book (handshake packets, wire format) was captured from a
-real running Socket.IO 4.8.4 server, and every default value was checked against the
-library's source code.
+## How this book was verified
+
+- Every protocol example (handshake packets, wire format) was captured from a real running
+  Socket.IO 4.8.4 server, and every default value was checked against the library's source.
+- Code was **run**, not just written: integration tests, labs and exercise solutions;
+  servers in **Python** (python-socketio, Flask-SocketIO), **Go**, **Rust** (socketioxide)
+  and **Java** (netty-socketio) tested against the official JS client; the **Java client**;
+  **WebTransport** over HTTP/3; a **custom adapter** across two servers via Redis; a
+  **custom parser**; **Bun** and **Deno**; the **offline outbox** and **E2EE** examples.
+- The **nginx and HAProxy** configurations were run in front of three nodes with the Redis
+  adapter (Chapter 8, Lab B in Chapter 23).
+- Version history was checked against the published npm packages, and the security table
+  (Chapter 6.10) against the npm/GitHub advisory database.
+- Not executable in the build environment, and checked against source code/docs instead:
+  the Swift and Dart clients, Electron, and the `deno.land/x` Deno port. These spots are
+  marked in their chapters.
 
 ---
 
@@ -23,7 +36,10 @@ library's source code.
 | A developer preparing for interview | Chapters 1–8 skim, then Chapter 14 (questions) fully    |
 | Working on a big production system  | Chapters 5, 6, 8, 10, 11, 12, 13                        |
 | Debugging something right now       | Chapter 12 (Troubleshooting) first                      |
-| Want a quick reference              | Chapter 15 (Cheat sheet & API reference)                |
+| Want a quick reference              | Chapter 15 (Cheat sheet) and Chapter 22 (all options)   |
+| Building mobile apps                | Chapter 16                                              |
+| Not using Node.js on the server     | Chapter 17                                              |
+| Learning by doing                   | Chapter 23 (labs & exercises), Chapter 24 (diagrams)    |
 
 ## Table of contents
 
@@ -42,6 +58,18 @@ library's source code.
 13. [Architecture, patterns, organisational best practices and full projects](13-architecture-patterns-projects.md)
 14. [Interview question bank — entry level to senior/architect (with detailed answers)](14-interview-questions.md)
 15. [Cheat sheet, full API reference and glossary](15-cheatsheet-api-reference.md)
+
+**Part II — Beyond the core**
+
+16. [Native mobile clients — Android (Java/Kotlin), iOS (Swift), Flutter (Dart)](16-native-mobile-clients.md)
+17. [Servers and clients in other languages — Python, Go, Rust, Java](17-other-languages.md)
+18. [WebTransport in practice (HTTP/3)](18-webtransport.md)
+19. [Writing a custom adapter and a custom parser](19-custom-adapters-parsers.md)
+20. [Other runtimes — Electron, workers, service workers, edge, Bun, Deno](20-other-runtimes.md)
+21. [Offline-first clients (outbox) and end-to-end encryption](21-offline-first-and-e2ee.md)
+22. [Complete options reference (every server and client option)](22-complete-options-reference.md)
+23. [Hands-on labs and exercises with solutions](23-exercises-and-labs.md)
+24. [Visual guide — diagrams of every key mechanism](24-visual-guide.md)
 
 ## The one-paragraph summary (if you remember nothing else)
 

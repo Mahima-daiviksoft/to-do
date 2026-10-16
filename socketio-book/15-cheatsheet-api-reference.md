@@ -268,4 +268,5 @@ Engine errors: `0` Transport unknown · `1` Session ID unknown · `2` Bad handsh
     reconnect, async connection handler, missing sticky sessions/adapter, ack without
     timeout.
 
-**Congratulations — you've finished the book.** Go back to [the table of contents](README.md).
+**You've finished Part I.** Part II goes beyond the core: [Chapter 16 — Native mobile
+clients](16-native-mobile-clients.md). Or go back to [the table of contents](README.md).

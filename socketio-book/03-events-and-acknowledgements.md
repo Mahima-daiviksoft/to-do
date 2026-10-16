@@ -303,6 +303,11 @@ try {
 const answers = await io.to("room-42").timeout(5000).emitWithAck("vote");
 ```
 
+- **Promise vs callback when some clients don't answer (verified):** `emitWithAck`
+  *rejects* on timeout, so you lose the answers that did arrive. The callback form gives
+  you both: `io.timeout(1000).emit("poll", q, (err, answers) => …)` — `err` is set, and
+  `answers` still contains every reply received in time. Use the callback form for polls,
+  health checks and anything where partial results are useful.
 - **Always use `.timeout()` with broadcast acks.** (In the 4.8 source, the broadcast
   timer is `setTimeout(..., this.flags.timeout)`; without a timeout it fires almost
   immediately with an error.)
