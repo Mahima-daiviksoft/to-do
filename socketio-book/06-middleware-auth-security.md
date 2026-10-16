@@ -327,6 +327,13 @@ Note: with the default `["polling", "websocket"]` transports, the initial pollin
 **is** subject to CORS, which helps — but an attacker can force `transports: ["websocket"]`
 to skip polling entirely, so you must protect the WebSocket path too.
 
+**Proof (tested on socket.io 4.8.4):** with `cors: { origin: "http://localhost:5173" }`, a
+raw WebSocket handshake to `/socket.io/?EIO=4&transport=websocket` carrying
+`Origin: https://evil.example` was **accepted** — the server answered with the Engine.IO
+open packet `0{"sid":…}`. The `cors` option only adds CORS headers to HTTP polling
+responses; it does not reject WebSocket upgrades. (python-socketio, by contrast, rejected
+the same request with HTTP 403 — see Chapter 17.)
+
 Defences (use several):
 
 1. **Check `Origin`** on the handshake and upgrade (`allowRequest`) against an allow-list.
@@ -344,6 +351,11 @@ const io = new Server(httpServer, {
   allowRequest: (req, cb) => cb(null, ALLOWED.has(req.headers.origin)),
 });
 ```
+
+Verified result of this exact configuration (4.8.4): allowed origin → accepted; forged
+`Origin: https://evil.example` → polling request answered **HTTP 403**
+`{"code":4,"message":"Forbidden"}`, WebSocket upgrade refused (**HTTP 400**), and
+`io.engine.on("connection_error")` logged code `4 Forbidden`.
 
 (Non-browser clients — mobile apps, Node scripts — may not send `Origin`. Decide
 explicitly: allow missing origin only if authentication is token-based.)
