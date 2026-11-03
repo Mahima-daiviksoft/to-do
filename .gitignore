@@ -73,3 +73,4 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+docs/websocket-stomp-guide/site/node_modules/

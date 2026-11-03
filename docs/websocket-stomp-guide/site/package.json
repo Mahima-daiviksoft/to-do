@@ -1,0 +1,7 @@
+{
+  "name": "websocket-stomp-book-site",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node build.mjs websocket-stomp-book.html" },
+  "devDependencies": { "highlight.js": "11.9.0", "marked": "12.0.2" }
+}
